@@ -1,5 +1,8 @@
 package com.iot.service;
 
-public interface IRoleService {
+import com.iot.entity.RoleEntity;
 
+public interface IRoleService {
+	RoleEntity save(RoleEntity entity);
+	RoleEntity findByCode(String code);
 }

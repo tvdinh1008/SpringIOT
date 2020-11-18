@@ -9,11 +9,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.apache.log4j.Logger;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.iot.dao.GenericDao;
+import com.iot.entity.UserEntity;
 
 import javassist.tools.rmi.ObjectNotFoundException;
-
+@Transactional
 public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T>  {
 	@PersistenceContext
 	protected EntityManager entityManager;

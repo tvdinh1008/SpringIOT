@@ -15,11 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.iot.entity.RoleEntity;
+import com.iot.service.IRoleService;
+
 @Controller
 public class WebController {
 	@Autowired
 	private MqttPahoMessageHandler mqtt;
-
+	
+	@Autowired
+	private IRoleService roleService;
+	
+	
 	@RequestMapping(value = "/trang-chu", method = RequestMethod.GET)
 	public ModelAndView getHomePage() throws MqttPersistenceException, MqttException {
 		String data = "Hế lo các bạn nhé !!!";

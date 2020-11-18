@@ -18,9 +18,13 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessagingException;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
 @Configuration
+@EnableAsync
+@EnableScheduling
 public class MQTTConfig {
 	private static final Logger logger = Logger.getLogger(MQTTConfig.class);
 
@@ -61,7 +65,7 @@ public class MQTTConfig {
 													// để chạy nhé !!!
 		return adapter;
 	}
-
+	//callback subscribe
 	@Bean
 	public PublishSubscribeChannel outbount() {
 		PublishSubscribeChannel psc = new PublishSubscribeChannel();

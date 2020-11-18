@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table (name = "user")
@@ -43,6 +45,7 @@ public class UserEntity {
 	
 	@ManyToOne(fetch = FetchType.LAZY,optional = false)
 	@JoinColumn(name = "role_id")
+	@JsonIgnore
 	private RoleEntity roleEntity;
 
 	public Long getId() {

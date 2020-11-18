@@ -92,7 +92,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/trang-chu?logout");
 		
 		http.authorizeRequests().antMatchers("/api/user/me").authenticated();
-		
+		http.authorizeRequests().antMatchers("/api/auth/edit").access("hasAnyRole('ROLE_USER','ROLE_ADMIN')");
 		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 		
 	}
