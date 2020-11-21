@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,11 +38,16 @@ public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<T> findAll() {
+	public List<T> findAll(String JOINFETCH) {
 		List<T> result = new ArrayList<T>();
 
 		try {
-			String sql = "select t from " + getPersistenceClassName() + " t";
+			String sql="";
+			if(StringUtils.isNotBlank(JOINFETCH)) {
+				sql = "select t from " + getPersistenceClassName() + " t JOIN FETCH t."+JOINFETCH;
+			}else {
+				sql = "select t from " + getPersistenceClassName() + " t";
+			}
 			result = entityManager.createQuery(sql).getResultList();
 		} catch (Exception e) {
 			return result;

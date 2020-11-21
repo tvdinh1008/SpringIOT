@@ -1,5 +1,7 @@
 package com.iot.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,19 @@ public class UserService implements IUserService {
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public List<UserEntity> findAll() {
+		//String JOIN_FETCH="roleEntity";
+		String JOIN_FETCH="";
+		List<UserEntity> result=userDao.findAll(JOIN_FETCH);
+		return result;
+	}
+
+	@Override
+	public UserEntity getUserWithUsername(String username) {
+		return userDao.findOneUsername(username);
 	}
 
 }

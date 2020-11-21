@@ -40,11 +40,11 @@ public class JwtTokenProvider {
 	public String getUserNameFromJwtToken(String token) {
 		return Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token).getBody().getSubject();
 	}
+	//
 
 	// Tạo chuỗi từ userid, cropid, deviceid =>DEVICE_TOKEN
-	public String generateToken(Long userid, Long cropid, Long deviceid) {
+	public String generateToken(Long userid, Long deviceid) {
 		Claims claims = Jwts.claims().setSubject(String.valueOf(userid));
-		claims.put("cropId", cropid);
 		claims.put("deviceId", deviceid);
 		
 		return Jwts.builder().setClaims(claims)
@@ -59,10 +59,8 @@ public class JwtTokenProvider {
 			Claims body = Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token).getBody();
 
 			Long userId = Long.parseLong(String.valueOf(body.get("sub")));
-			Long cropId = Long.parseLong(String.valueOf(body.get("cropId")));
 			Long deviceId = Long.parseLong(String.valueOf(body.get("deviceId")));
 			result.add(userId);
-			result.add(cropId);
 			result.add(deviceId);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
