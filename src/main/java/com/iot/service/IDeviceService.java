@@ -1,7 +1,9 @@
 package com.iot.service;
 
-import com.iot.entity.DeviceEntity;
+import com.iot.dto.DeviceDto;
 
 public interface IDeviceService {
-	DeviceEntity save(DeviceEntity entity);
+	DeviceDto findById(Long id);
+	DeviceDto save(DeviceDto dto);
+	DeviceDto getListSensor(Long id);
 }

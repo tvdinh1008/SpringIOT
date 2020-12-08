@@ -16,12 +16,27 @@ public class SensorDao extends AbstractDao<Long, SensorEntity> implements ISenso
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<SensorEntity> findByListDeviceId(Long deviceId) {
-		List<SensorEntity> result=new ArrayList<SensorEntity>();
-		String sql="Select * from sensor t where t.device=:device";
-		Query q = entityManager.createNativeQuery(sql,SensorEntity.class);
+		List<SensorEntity> result = new ArrayList<SensorEntity>();
+		String sql = "Select * from sensor t where t.device=:device";
+		Query q = entityManager.createNativeQuery(sql, SensorEntity.class);
 		q.setParameter("device", deviceId);
-		result=q.getResultList();
+		result = q.getResultList();
 		return result;
+	}
+
+	@Override
+	public SensorEntity findAllDataSensor(Long id) {
+		SensorEntity entity = null;
+		try {
+			String sql = "select t from " + getPersistenceClassName()
+					+ " t JOIN FETCH t.sensorDataList where t.id=:id";
+			Query q = entityManager.createQuery(sql);
+			q.setParameter("id", id);
+			entity = (SensorEntity) q.getSingleResult();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return entity;
 	}
 
 }

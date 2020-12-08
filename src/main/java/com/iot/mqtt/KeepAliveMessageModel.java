@@ -3,7 +3,7 @@ package com.iot.mqtt;
 public class KeepAliveMessageModel {
 	
 	/*
-	 * crop ID, user ID and device ID 
+	 * user ID and device ID 
 	 */
 	String device_token;
 	/*

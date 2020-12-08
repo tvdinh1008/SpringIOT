@@ -17,6 +17,8 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
+
 @Configuration
 @ComponentScan(basePackages = "com.iot.dao")
 //@EnableJpaRepositories(basePackages = {"com.iot.repository"})
@@ -27,56 +29,62 @@ public class JPAConfig {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setDataSource(dataSource());
 		em.setPersistenceUnitName("persistence-data");
-		
+
 		em.setPackagesToScan(new String[] { "com.iot.entity" });
-		
+
 		JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		em.setJpaVendorAdapter(vendorAdapter);
 		em.setJpaProperties(additionalProperties());
 		return em;
 	}
-	
+
 	@Bean
-	public PlatformTransactionManager  transactionManager(EntityManagerFactory entityManagerFactory) {
+	public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
 		JpaTransactionManager transactionManager = new JpaTransactionManager();
 		transactionManager.setEntityManagerFactory(entityManagerFactory);
 		return transactionManager;
 	}
-	
+
 	@Bean
 	public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
 		return new PersistenceExceptionTranslationPostProcessor();
 	}
-	
-	//Config tới database
+
+	// Config tới database
 	@Bean
 	public DataSource dataSource() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		/*
-		dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-		dataSource.setUrl("jdbc:sqlserver://localhost:1433;databaseName=IOT_NFT;integratedSecurity=true");
-		dataSource.setUsername("a");
-		dataSource.setPassword("a");
-		return dataSource;
-		*/
+		 * dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver")
+		 * ; dataSource.setUrl(
+		 * "jdbc:sqlserver://localhost:1433;databaseName=IOT_NFT;integratedSecurity=true"
+		 * ); dataSource.setUsername("a"); dataSource.setPassword("a"); return
+		 * dataSource;
+		 */
 		dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
 		dataSource.setUrl("jdbc:mysql://localhost:3306/IOT_DEMO");
 		dataSource.setUsername("root");
 		dataSource.setPassword("root");
 		return dataSource;
 	}
-	
-	//Thêm một số thuộc tính khi kết nối tới database
+
+	// Thêm một số thuộc tính khi kết nối tới database
 	public Properties additionalProperties() {
 		Properties properties = new Properties();
 		properties.setProperty("hibernate.hbm2ddl.auto", "update");
-		//properties.setProperty("hibernate.dialect", "org.hibernate.dialect.SQLServerDialect");
+		// properties.setProperty("hibernate.dialect",
+		// "org.hibernate.dialect.SQLServerDialect");
 		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-		//properties.setProperty("hibernate.enable_lazy_load_no_trans", "true");
+		// properties.setProperty("hibernate.enable_lazy_load_no_trans", "true");
 		properties.setProperty("hibernate.format_sql", "true");
-	    properties.setProperty("hibernate.show_sql", "true");
-	    
+		properties.setProperty("hibernate.show_sql", "true");
+
 		return properties;
 	}
-	
+
+	@Bean
+	public Hibernate4Module hibernate4Module() {
+		return new Hibernate4Module();
+	}
+
 }

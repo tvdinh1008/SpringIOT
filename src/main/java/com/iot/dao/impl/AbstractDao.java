@@ -13,11 +13,11 @@ import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.iot.dao.GenericDao;
-import com.iot.entity.UserEntity;
 
 import javassist.tools.rmi.ObjectNotFoundException;
+
 @Transactional
-public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T>  {
+public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T> {
 	@PersistenceContext
 	protected EntityManager entityManager;
 	protected final Logger logger = Logger.getLogger(this.getClass());
@@ -34,18 +34,16 @@ public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T
 		return persistenceClass.getSimpleName();
 	}
 
-	
-	
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<T> findAll(String JOINFETCH) {
 		List<T> result = new ArrayList<T>();
 
 		try {
-			String sql="";
-			if(StringUtils.isNotBlank(JOINFETCH)) {
-				sql = "select t from " + getPersistenceClassName() + " t JOIN FETCH t."+JOINFETCH;
-			}else {
+			String sql = "";
+			if (StringUtils.isNotBlank(JOINFETCH)) {
+				sql = "select t from " + getPersistenceClassName() + " t JOIN FETCH t." + JOINFETCH;
+			} else {
 				sql = "select t from " + getPersistenceClassName() + " t";
 			}
 			result = entityManager.createQuery(sql).getResultList();
@@ -91,7 +89,7 @@ public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-		} 
+		}
 		return result;
 	}
 
@@ -106,7 +104,7 @@ public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-		} 
+		}
 		return count;
 	}
 

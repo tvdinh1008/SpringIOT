@@ -13,18 +13,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 
+
 @Entity
 @Table(name = "sensor_data")
-public class SensorDataEntity {
+public class SensorDataEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Column(name = "value")
 	private Float value;
 	@Column(name = "time")
-	private Date time; 
+	private Date time;
 	
-	@ManyToOne(optional = false,fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "sensor")
 	private SensorEntity sensorEntity;
 
@@ -59,7 +60,5 @@ public class SensorDataEntity {
 	public void setSensorEntity(SensorEntity sensorEntity) {
 		this.sensorEntity = sensorEntity;
 	}
-	
-	
 
 }

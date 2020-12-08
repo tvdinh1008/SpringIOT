@@ -2,10 +2,11 @@ package com.iot.service;
 
 import java.util.List;
 
-import com.iot.entity.UserEntity;
-
+import com.iot.dto.UserDto;
 public interface IUserService {
-	UserEntity save(UserEntity entity);
-	List<UserEntity> findAll();
-	UserEntity getUserWithUsername(String username);
+	
+	UserDto save(UserDto dto);
+	List<UserDto> findAll();
+	UserDto getUserWithUsername(String username);
+	UserDto findById(Long id);
 }

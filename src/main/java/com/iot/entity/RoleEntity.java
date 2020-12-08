@@ -1,6 +1,7 @@
 package com.iot.entity;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,7 +29,7 @@ public class RoleEntity {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "roleEntity", fetch = FetchType.LAZY)
-	private List<UserEntity> userList;
+	private Set<UserEntity> userList=new HashSet<UserEntity>();
 
 	public Long getId() {
 		return id;
@@ -54,12 +55,14 @@ public class RoleEntity {
 		this.code = code;
 	}
 
-	public List<UserEntity> getUserList() {
+	public Set<UserEntity> getUserList() {
 		return userList;
 	}
 
-	public void setUserList(List<UserEntity> userList) {
+	public void setUserList(Set<UserEntity> userList) {
 		this.userList = userList;
 	}
+
+	
 	
 }

@@ -12,40 +12,33 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-
 @Entity
-@Table (name = "user")
+@Table(name = "user")
 public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@Column(name="username", columnDefinition = "nvarchar(250) NOT NULL UNIQUE")
+
+	@Column(name = "username", columnDefinition = "nvarchar(250) NOT NULL UNIQUE")
 	private String username;
-	
-	@Column(name="full_name", columnDefinition = "nvarchar(250)")
+
+	@Column(name = "full_name", columnDefinition = "nvarchar(250)")
 	private String full_name;
-	
+
 	@Column(name = "email")
 	private String email;
-	
-	@Column(name="password")
+
+	@Column(name = "password")
 	private String password;
-	
-	@Column(name="status")
+
+	@Column(name = "status")
 	private int status;
-	
+
 	@Column(name = "create_time")
 	private Date create_time;
-	
-	@Column(name = "last_login")
-	private Date last_login;
-	
-	@ManyToOne(fetch = FetchType.LAZY,optional = false)
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "role_id")
-	//@JsonIgnore
 	private RoleEntity roleEntity;
 
 	public Long getId() {
@@ -104,14 +97,6 @@ public class UserEntity {
 		this.create_time = create_time;
 	}
 
-	public Date getLast_login() {
-		return last_login;
-	}
-
-	public void setLast_login(Date last_login) {
-		this.last_login = last_login;
-	}
-
 	public RoleEntity getRoleEntity() {
 		return roleEntity;
 	}
@@ -119,5 +104,5 @@ public class UserEntity {
 	public void setRoleEntity(RoleEntity roleEntity) {
 		this.roleEntity = roleEntity;
 	}
-	
+
 }

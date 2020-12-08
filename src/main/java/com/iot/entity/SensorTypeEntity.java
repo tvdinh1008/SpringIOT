@@ -1,5 +1,6 @@
 package com.iot.entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -11,8 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
 @Table(name = "sensor_type")
 public class SensorTypeEntity {
@@ -20,12 +19,11 @@ public class SensorTypeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(name="name", columnDefinition = "nvarchar(250)")
+	@Column(name = "name", columnDefinition = "nvarchar(250)")
 	private String name;
-	
-	@JsonIgnore
-	@OneToMany(mappedBy = "sensorTypeEntity",fetch = FetchType.LAZY)
-	private Set<SensorEntity> sensorList;
+
+	@OneToMany(mappedBy = "sensorTypeEntity", fetch = FetchType.LAZY)
+	private Set<SensorEntity> sensorList = new HashSet<SensorEntity>();
 
 	public Long getId() {
 		return id;
@@ -50,6 +48,5 @@ public class SensorTypeEntity {
 	public void setSensorList(Set<SensorEntity> sensorList) {
 		this.sensorList = sensorList;
 	}
-
 
 }

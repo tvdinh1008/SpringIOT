@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -28,7 +29,7 @@ public class JwtTokenProvider {
 	private final long JWT_EXPIRATION = 604800000L;//chia 1000 sẽ ra giây
 
 	// Tạo chuỗi jwt từ thông tin của user
-	public String generateJwtToken(Authentication authentication) {
+	public String generateJwtTokenUsername(Authentication authentication) {
 		MyUser userPrincipal = (MyUser) authentication.getPrincipal();
 
 		return Jwts.builder().setSubject(userPrincipal.getUsername())
@@ -40,10 +41,39 @@ public class JwtTokenProvider {
 	public String getUserNameFromJwtToken(String token) {
 		return Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token).getBody().getSubject();
 	}
-	//
+	
+	// Tạo chuỗi từ username, deivceid =>dùng để active device
+	public String generateTokenAuthActiveDevice(String username, Long deviceid) {
+		Claims claims = Jwts.claims().setSubject(username);
+		claims.put("deviceId", deviceid);
+		
+		return Jwts.builder().setClaims(claims)
+				.setExpiration(new Date((new Date()).getTime() + 604800000L)) //thời gian có hiệu lực là 60s
+				.signWith(SignatureAlgorithm.HS512, JWT_SECRET).compact();
+	}
+ 	//Lấy thông tin active device
+	
+	public List<String> parseTokenAuthenActiveData(String token){
+		List<String> result=new ArrayList<String>();
+		try {
+			Claims body = Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token).getBody();
+			String username=String.valueOf(body.get("sub"));
+			String deviceId=String.valueOf(body.get("deviceId"));
+			
+			if(StringUtils.isNotBlank(username) && StringUtils.isNotBlank(deviceId)) {
+				result.add(username);
+				result.add(deviceId);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		
+		return result;
+	}
+	
 
-	// Tạo chuỗi từ userid, cropid, deviceid =>DEVICE_TOKEN
-	public String generateToken(Long userid, Long deviceid) {
+	// Tạo chuỗi từ userid, deviceid =>DEVICE_TOKEN
+	public String generateTokenCollectData(Long userid, Long deviceid) {
 		Claims claims = Jwts.claims().setSubject(String.valueOf(userid));
 		claims.put("deviceId", deviceid);
 		
@@ -53,7 +83,7 @@ public class JwtTokenProvider {
 	}
 
 	// Lấy thông tin từ chuỗi DEVICE_TOKEN
-	public List<Long> parseToken(String token) {
+	public List<Long> parseTokenCollectData(String token) {
 		List<Long> result = new ArrayList<Long>();
 		try {
 			Claims body = Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token).getBody();
@@ -71,7 +101,7 @@ public class JwtTokenProvider {
 
 	// Kiểm tra thông tin token. Có 
 	public boolean validateJwtToken(String authToken) {
-		try {
+		try {	
 			Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(authToken);
 			return true;
 		} catch (SignatureException e) {

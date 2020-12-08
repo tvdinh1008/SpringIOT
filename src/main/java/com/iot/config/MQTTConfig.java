@@ -1,6 +1,7 @@
 package com.iot.config;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -25,6 +26,7 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,7 +49,19 @@ public class MQTTConfig {
 	private IDeviceDao deviceDao;
 	@Autowired
 	private ISensorService sensorService;
-
+	
+	
+	private static List<Long> ids=new ArrayList<Long>();
+	private static List<Long> tmpIds=new ArrayList<Long>();
+	
+	@Scheduled(cron = "0 20 1 * * MON-THU")
+    public void doSomething() {
+        System.out.println("Do some thing");
+ 
+    }
+	
+	
+	
 	// Of course , you can define the Executor too
 	@Bean
 	public Executor taskExecutor() {
@@ -75,7 +89,7 @@ public class MQTTConfig {
 	@Bean
 	public MessageProducer inbound() {
 		MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter("clientId",
-				mqttClientFactory(), "iot/authentication", "iot/collectdata");
+				mqttClientFactory(), "iot/authentication", "iot/collectdata", "iot/keepAlive");
 		adapter.setCompletionTimeout(5000);
 		adapter.setConverter(new DefaultPahoMessageConverter());
 		adapter.setQos(2);
@@ -103,22 +117,23 @@ public class MQTTConfig {
 					try {
 						JwtAuthRequest authModel = new ObjectMapper().readValue(message.getPayload().toString(),
 								JwtAuthRequest.class);
-						deviceID = authModel.getId();
-						if (StringUtils.isNotBlank(authModel.getUser_token())
-								&& tokenProvider.validateJwtToken(authModel.getUser_token())) {
-							String username = tokenProvider.getUserNameFromJwtToken(authModel.getUser_token());
+						deviceID = authModel.getDeviceId();
+						if (StringUtils.isNotBlank(authModel.getToken())
+								&& tokenProvider.validateJwtToken(authModel.getToken())) {
+							String username = tokenProvider.getUserNameFromJwtToken(authModel.getToken());
 							// Sau khi xác thực thì ta sẽ chuyển alive của device=1 tức là nó sẵn sàng
-							DeviceEntity device = deviceDao.findByIdAndUsername(username, authModel.getId());
+							DeviceEntity device = deviceDao.findByIdAndUsername(username, authModel.getDeviceId());
 							if (device != null) {
 								String topic_result = "iot/authentication_result_" + device.getId();
-								String jwt = tokenProvider.generateToken(device.getUser().getId(), device.getId());
+								String jwt = tokenProvider.generateTokenCollectData(device.getUser().getId(), device.getId());
 								System.out.println("Device token:" + jwt);
 								device.setAlive(1);
 								if (deviceDao.update(device) != null) {
 									// nếu xác thực thành công
 									JwtAuthResponse data = new JwtAuthResponse();
-									data.setDevice_token(jwt);
+									data.setToken(jwt);
 									data.setId(device.getId());
+									data.setReply("true");
 									String jsonData = new ObjectMapper().writeValueAsString(data);
 									Message<String> messageauth = MessageBuilder.withPayload(jsonData)
 											.setHeader(MqttHeaders.TOPIC, topic_result).build();
@@ -140,23 +155,25 @@ public class MQTTConfig {
 					mqqtMessageHandler().handleMessage(messageauth);
 					return;
 				}
+				if(received_topic.equals("iot/keepAlive")) {
+					
+				}
 				if (received_topic.equals("iot/collectdata")) {
 					try {
 						CollectDataModel collectData = new ObjectMapper().readValue(message.getPayload().toString(),
 								CollectDataModel.class);
 
-						if (StringUtils.isNotBlank(collectData.getDevice_token())
+				  		if (StringUtils.isNotBlank(collectData.getDevice_token())
 								&& tokenProvider.validateJwtToken(collectData.getDevice_token())) {
 
-							List<Long> ids = tokenProvider.parseToken(collectData.getDevice_token());
+							List<Long> ids = tokenProvider.parseTokenCollectData(collectData.getDevice_token());
 							if (ids != null && ids.size() == 2) {
-								if (ids.get(1) == collectData.getId()) {
+								DeviceEntity device =deviceDao.findByIdAndUserID(ids.get(0), ids.get(1));
+								if (device !=null && device.getAlive()==1 && device.getId() == collectData.getId()) {
 									sensorService.saveCollectData(collectData);
 								}
-
 							}
 						}
-
 					} catch (Exception e) {
 						logger.error(e.getMessage());
 					}
