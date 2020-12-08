@@ -1,27 +1,31 @@
 package com.iot.mqtt;
 
 public class KeepAliveMessageModel {
-	
-	/*
-	 * user ID and device ID 
-	 */
-	String device_token;
-	/*
-	 * 
-	 */
 	Long deviceId;
-	
-	public String getDevice_token() {
-		return device_token;
-	}
-	public void setDevice_token(String device_token) {
-		this.device_token = device_token;
-	}
+	String token;
+	String active;
+
 	public Long getDeviceId() {
 		return deviceId;
 	}
+
 	public void setDeviceId(Long deviceId) {
 		this.deviceId = deviceId;
 	}
-	
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public String getActive() {
+		return active;
+	}
+
+	public void setActive(String active) {
+		this.active = active;
+	}
 }

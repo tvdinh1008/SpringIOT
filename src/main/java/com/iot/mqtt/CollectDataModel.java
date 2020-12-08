@@ -1,41 +1,44 @@
 package com.iot.mqtt;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class CollectDataModel {
-	private Long id;
-	private String device_token;
-	private Float humidity;
-	private Float temperature;
-	private Float ec;
-	public Long getId() {
-		return id;
+	private Long deviceId;
+	private String token;
+	private Long time;
+	private Set<DataModel> sensorDataList = new HashSet<DataModel>();
+
+	public Long getDeviceId() {
+		return deviceId;
 	}
-	public void setId(Long id) {
-		this.id = id;
+
+	public void setDeviceId(Long deviceId) {
+		this.deviceId = deviceId;
 	}
-	public String getDevice_token() {
-		return device_token;
+
+	public String getToken() {
+		return token;
 	}
-	public void setDevice_token(String device_token) {
-		this.device_token = device_token;
+
+	public void setToken(String token) {
+		this.token = token;
 	}
-	public Float getHumidity() {
-		return humidity;
+
+	public Long getTime() {
+		return time;
 	}
-	public void setHumidity(Float humidity) {
-		this.humidity = humidity;
+
+	public void setTime(Long time) {
+		this.time = time;
 	}
-	public Float getTemperature() {
-		return temperature;
+
+	public Set<DataModel> getSensorDataList() {
+		return sensorDataList;
 	}
-	public void setTemperature(Float temperature) {
-		this.temperature = temperature;
+
+	public void setSensorDataList(Set<DataModel> sensorDataList) {
+		this.sensorDataList = sensorDataList;
 	}
-	public Float getEc() {
-		return ec;
-	}
-	public void setEc(Float ec) {
-		this.ec = ec;
-	}
-	
-	
+
 }

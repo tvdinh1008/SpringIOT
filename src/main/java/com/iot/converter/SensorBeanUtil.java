@@ -11,13 +11,8 @@ public class SensorBeanUtil {
 		SensorDto dto = new SensorDto();
 		dto.setId(entity.getId());
 		dto.setName(entity.getName());
-		try {
-			if (entity.getSensorTypeEntity() != null) {
-				dto.setSensorTypeDto(SensorTypeBeanUtil.entity2Dto(entity.getSensorTypeEntity()));
-			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
+		dto.setStatus(entity.getStatus());
+		dto.setCode(entity.getCode());
 		try {
 			if (entity.getDeviceEntity() != null && k != 1) {
 				dto.setDeviceDto(DeviceBeanUtil.entity2Dto(entity.getDeviceEntity()));
@@ -40,8 +35,15 @@ public class SensorBeanUtil {
 		SensorEntity entity = new SensorEntity();
 		entity.setId(dto.getId());
 		entity.setName(dto.getName());
-		entity.setDeviceEntity(DeviceBeanUtil.dto2Entity(dto.getDeviceDto()));
-		entity.setSensorTypeEntity(SensorTypeBeanUtil.dto2Entity(dto.getSensorTypeDto()));
+		entity.setCode(dto.getCode());
+		entity.setStatus(dto.getStatus());
+		try {
+			if (dto.getDeviceDto() != null) {
+				entity.setDeviceEntity(DeviceBeanUtil.dto2Entity(dto.getDeviceDto()));
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 		try {
 			for (SensorDataDto sensorDataDto : dto.getSensorDataList()) {
 				entity.getSensorDataList().add(SensorDataBeanUtil.dto2Entity(sensorDataDto));

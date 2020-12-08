@@ -48,7 +48,7 @@ public class WebAPI {
 	private ISensorDataService sensorDataService;
 	@Autowired
 	private ISensorService sensorService;
-	
+
 	@Autowired
 	AuthenticationManager authenticationManager;
 	@Autowired
@@ -161,23 +161,45 @@ public class WebAPI {
 				result.setToken(user_token);
 			}
 		}
+		/*
+		 * result đã có đủ cả sensor list nhé
+		 */
 		return result;
 	}
 
-	// Generate token device authen
+	// Generate token device authen(Active device)
 	@GetMapping("/api/device/{id}/generatetoken")
 	public JwtAuthRequest getGenerateAuthDevice(@PathVariable("id") Long id, HttpServletRequest request) {
 		String user_token = "";
 		DeviceDto deviceDto = deviceService.findById(id);
 		JwtAuthRequest result = new JwtAuthRequest();
 		String bearerToken = request.getHeader("Authorization");
-		if (deviceDto !=null && StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+		if (deviceDto != null && StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
 			user_token = bearerToken.substring(7);
 			if (tokenProvider.validateJwtToken(user_token)) {
 				UserDto user = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(user_token));
 				result.setDeviceId(deviceDto.getId());
-				
+
 				result.setToken(tokenProvider.generateTokenAuthActiveDevice(user.getUsername(), deviceDto.getId()));
+			}
+		}
+		return result;
+	}
+
+	// Generate token device authen(Active device)
+	@GetMapping("/api/device/{id}/generatetokencollect")
+	public JwtAuthRequest getGenerateTokenCollect(@PathVariable("id") Long id, HttpServletRequest request) {
+		String user_token = "";
+		DeviceDto deviceDto = deviceService.findById(id);
+		JwtAuthRequest result = new JwtAuthRequest();
+		String bearerToken = request.getHeader("Authorization");
+		if (deviceDto != null && StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			user_token = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(user_token)) {
+				UserDto user = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(user_token));
+				result.setDeviceId(deviceDto.getId());
+
+				result.setToken(tokenProvider.generateTokenCollectData(user.getId(), deviceDto.getId()));
 			}
 		}
 		return result;
@@ -189,25 +211,22 @@ public class WebAPI {
 		return result;
 	}
 	/*
-	@GetMapping("/api/device/{id}/alldata")
-	public List<SensorDataDto> getAllDataSensor(@PathVariable("id") Long id) {
-		List<SensorDataDto> result = sensorDataService.findAllDataSensorId(id);
-		return result;
-	}
-	*/
-	
+	 * @GetMapping("/api/device/{id}/alldata") public List<SensorDataDto>
+	 * getAllDataSensor(@PathVariable("id") Long id) { List<SensorDataDto> result =
+	 * sensorDataService.findAllDataSensorId(id); return result; }
+	 */
+
 	@GetMapping("/api/device/{id}/alldata")
 	public List<SensorDto> getAllDataSensor(@PathVariable("id") Long id) {
 		List<SensorDto> result = sensorService.getAllData(id);
 		return result;
 	}
-	
+
 	@GetMapping("/api/device/{id}/listsensor")
-	public List<SensorDto> getListSensorOfDevice(@PathVariable("id") Long id){
-		List<SensorDto> result=new ArrayList<SensorDto>(deviceService.getListSensor(id).getSensorList());
-		
+	public List<SensorDto> getListSensorOfDevice(@PathVariable("id") Long id) {
+		List<SensorDto> result = new ArrayList<SensorDto>(deviceService.getListSensor(id).getSensorList());
+
 		return result;
 	}
-	
 
 }

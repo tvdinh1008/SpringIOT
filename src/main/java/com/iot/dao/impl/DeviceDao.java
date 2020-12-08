@@ -1,6 +1,10 @@
 package com.iot.dao.impl;
 
+import java.util.Date;
+import java.util.List;
+
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
 
@@ -58,6 +62,56 @@ public class DeviceDao extends AbstractDao<Long, DeviceEntity> implements IDevic
 			logger.error(e.getMessage());
 		}
 		return result;
+	}
+
+	@Transactional
+	@Override
+	public void updateKeepAlive(List<Long> ids) {
+		try {
+			Query q =null;
+			if (ids.size() != 0) {
+				String sql1 = "UPDATE " + getPersistenceClassName() + " e SET e.alive=1,e.updated_at=:datenow where e.id IN(";
+				int flag = 0;
+				for (Long id : ids) {
+					if (flag == 0) {
+						sql1 += id.toString();
+						flag++;
+					} else {
+						sql1 += "," + id.toString();
+					}
+				}
+				sql1 += ")";
+				
+				/*
+				 * chỉ cập nhật những thằng nào alive=1 khi mà ko thuộc IN
+				 */
+				q = entityManager.createQuery(sql1);
+				q.setParameter("datenow", new Date());
+				q.executeUpdate();
+				String sql2 = "UPDATE " + getPersistenceClassName() + " e SET e.alive=0,e.updated_at=:datenow where e.id NOT IN(";
+				flag = 0;
+				for (Long id : ids) {
+					if (flag == 0) {
+						sql2 += id.toString();
+						flag++;
+					} else {
+						sql2 += "," + id.toString();
+					}
+				}
+				sql2 += ") and e.alive=1";
+				q = entityManager.createQuery(sql2);
+				q.setParameter("datenow", new Date());
+				q.executeUpdate();
+			} else {
+				String sql1 = "UPDATE " + getPersistenceClassName() + " e SET e.alive=0, e.updated_at=:datenow where e.alive !=0";
+				q=entityManager.createQuery(sql1);
+				q.setParameter("datenow", new Date());
+				q.executeUpdate();
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+
 	}
 
 }

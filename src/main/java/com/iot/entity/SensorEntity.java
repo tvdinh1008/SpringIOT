@@ -25,29 +25,8 @@ public class SensorEntity {
 
 	@Column(name = "code", columnDefinition = "nvarchar(250)")
 	private String code;
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public Long getStatus() {
-		return status;
-	}
-
-	public void setStatus(Long status) {
-		this.status = status;
-	}
-
 	@Column(name = "status")
-	private Long status;
-
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "sensor_type")
-	private SensorTypeEntity sensorTypeEntity;
+	private Integer status;
 
 	@OneToMany(mappedBy = "sensorEntity", fetch = FetchType.LAZY)
 	private Set<SensorDataEntity> sensorDataList = new HashSet<SensorDataEntity>();
@@ -58,6 +37,22 @@ public class SensorEntity {
 
 	public DeviceEntity getDeviceEntity() {
 		return deviceEntity;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
 	public void setDeviceEntity(DeviceEntity deviceEntity) {
@@ -78,14 +73,6 @@ public class SensorEntity {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public SensorTypeEntity getSensorTypeEntity() {
-		return sensorTypeEntity;
-	}
-
-	public void setSensorTypeEntity(SensorTypeEntity sensorTypeEntity) {
-		this.sensorTypeEntity = sensorTypeEntity;
 	}
 
 	public Set<SensorDataEntity> getSensorDataList() {

@@ -48,14 +48,6 @@ public class DeviceEntity {
 		this.userEntity = userEntity;
 	}
 
-	public UserEntity getUser() {
-		return userEntity;
-	}
-
-	public void setUser(UserEntity user) {
-		this.userEntity = user;
-	}
-
 	public Long getId() {
 		return id;
 	}

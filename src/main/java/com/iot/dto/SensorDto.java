@@ -10,12 +10,29 @@ public class SensorDto implements Serializable {
 
 	private Long id;
 	private String name;
-	private SensorTypeDto sensorTypeDto;
+	private String code;
+	private Integer status;
 	private Set<SensorDataDto> sensorDataList = new HashSet<SensorDataDto>();
 	private DeviceDto deviceDto;
 
 	public Long getId() {
 		return id;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
 	public void setId(Long id) {
@@ -28,14 +45,6 @@ public class SensorDto implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public SensorTypeDto getSensorTypeDto() {
-		return sensorTypeDto;
-	}
-
-	public void setSensorTypeDto(SensorTypeDto sensorTypeDto) {
-		this.sensorTypeDto = sensorTypeDto;
 	}
 
 	public Set<SensorDataDto> getSensorDataList() {

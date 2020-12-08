@@ -1,6 +1,7 @@
 package com.iot.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +11,12 @@ import com.iot.converter.SensorBeanUtil;
 import com.iot.dao.IDeviceDao;
 import com.iot.dao.ISensorDao;
 import com.iot.dao.ISensorDataDao;
-import com.iot.dto.SensorDataDto;
 import com.iot.dto.SensorDto;
 import com.iot.entity.DeviceEntity;
 import com.iot.entity.SensorDataEntity;
 import com.iot.entity.SensorEntity;
 import com.iot.mqtt.CollectDataModel;
+import com.iot.mqtt.DataModel;
 import com.iot.service.ISensorService;
 
 @Service
@@ -50,20 +51,21 @@ public class SensorService implements ISensorService {
 
 	@Override
 	public void saveCollectData(CollectDataModel collectData) {
-		List<SensorDto> result = findByListDeviceId(collectData.getId());
-		for (SensorDto item : result) {
+		/*
+		 * Gửi là múi giờ thứ 7 (tức 7*60*60=25200) mà hàm dưới tự lấy múi giờ của mình(+7) =>Bị cộng 2 lần múi giờ thứ 7
+		 */
+		Date time = new Date(collectData.getTime()*1000l - 25200000l);
+		for (DataModel data : collectData.getSensorDataList()) {
 			SensorDataEntity entity = new SensorDataEntity();
-			entity.setSensorEntity(SensorBeanUtil.dto2Entity(item));
-			if (item.getName().equals("temperature")) {
-				entity.setValue(collectData.getTemperature());
-			} else if (item.getName().equals("humidity")) {
-				entity.setValue(collectData.getHumidity());
-			} else if (item.getName().equals("ec")) {
-				entity.setValue(collectData.getEc());
+			SensorEntity sensor = sensorDao.findByCode(data.getCode());
+			if (sensor == null || sensor.getStatus() == 0) {
+				continue;
 			}
+			entity.setSensorEntity(sensor);
+			entity.setTime(time);
+			entity.setValue(data.getValue());
 			sensorDataDao.save(entity);
 		}
-
 	}
 
 	@Override
@@ -79,8 +81,8 @@ public class SensorService implements ISensorService {
 		}
 		List<SensorDto> result = new ArrayList<SensorDto>();
 		for (Long id : ids) {
-			SensorEntity entity=sensorDao.findAllDataSensor(id);
-			if(entity!=null) {
+			SensorEntity entity = sensorDao.findAllDataSensor(id);
+			if (entity != null) {
 				result.add(SensorBeanUtil.entity2Dto(entity, 0));
 			}
 		}

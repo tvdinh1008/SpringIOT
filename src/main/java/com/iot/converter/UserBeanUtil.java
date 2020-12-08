@@ -32,7 +32,9 @@ public class UserBeanUtil {
 		entity.setStatus(dto.getStatus());
 		entity.setCreate_time(dto.getCreate_time());
 		try {
-			entity.setRoleEntity(RoleBeanUtil.entity2Dto(dto.getRoleDto()));
+			if (dto.getRoleDto() != null) {
+				entity.setRoleEntity(RoleBeanUtil.entity2Dto(dto.getRoleDto()));
+			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
