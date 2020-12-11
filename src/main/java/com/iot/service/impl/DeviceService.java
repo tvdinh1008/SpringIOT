@@ -95,7 +95,7 @@ public class DeviceService implements IDeviceService {
 	@Override
 	public DeviceDto getInfoDevice(Long id, String username) {
 		DeviceDto result=null;
-		String JOIN_FETCH = "sensorList s JOIN FETCH s.sensorDataList";
+		String JOIN_FETCH = "sensorList s LEFT JOIN FETCH s.sensorDataList";
 		result=DeviceBeanUtil.entity2Dto( deviceDao.findByIdWithProp(id, JOIN_FETCH, 0), 2);
 		return result;
 	}
