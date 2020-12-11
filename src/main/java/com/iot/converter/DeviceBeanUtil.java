@@ -40,7 +40,7 @@ public class DeviceBeanUtil {
 		dto.setCreated_at(entity.getCreated_at());
 		dto.setUpdated_at(entity.getUpdated_at());
 		try {
-			if(entity.getUserEntity()!=null) {
+			if(entity.getUserEntity()!=null && k!=1) {
 				dto.setUserDto(UserBeanUtil.entity2Dto(entity.getUserEntity()));
 			}
 		}catch (Exception e) {

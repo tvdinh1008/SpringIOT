@@ -9,5 +9,6 @@ public interface IDeviceService {
 	DeviceDto save(DeviceDto dto);
 	DeviceDto getListSensor(Long id);
 	List<DeviceDto> getListDeviceByUser(String username);
+	List<DeviceDto> getListDeviceByAdmin(String username);
 	DeviceDto getInfoDevice(Long id, String username);
 }

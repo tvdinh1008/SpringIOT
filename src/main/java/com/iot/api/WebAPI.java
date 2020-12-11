@@ -129,12 +129,6 @@ public class WebAPI {
 		return null;
 	}
 
-	// Lấy danh sách user
-	@GetMapping("/api/auth/list")
-	public List<UserDto> getAllUser() {
-		return userService.findAll();
-	}
-
 	// Generate TokenUser
 	@PostMapping("/api/auth/token")
 	public String getTokenUser(@RequestBody UserDto dto) {
@@ -153,7 +147,7 @@ public class WebAPI {
 	}
 
 	/*
-	 * Lấy danh sách device
+	 * Lấy danh sách device ứng với user dựa vào jwt của user
 	 */
 	@GetMapping("/api/device/list")
 	public List<DeviceDto> getListDeviceByUser(HttpServletRequest request) {
@@ -173,7 +167,7 @@ public class WebAPI {
 	}
 
 	/*
-	 * Thêm mới thiết bị
+	 * Thêm mới thiết bị user tự thêm dựa vào jwt của user
 	 */
 	@PostMapping("/api/device")
 	public JwtAuthRequest saveDevice(@RequestBody DeviceDto device, HttpServletRequest request) {
@@ -187,10 +181,12 @@ public class WebAPI {
 				UserDto user = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(user_token));
 				device.setUserDto(user);
 				device = deviceService.save(device);
+				result.setDeviceDto(device);
 				result.setDeviceId(device.getId());
 				result.setToken(user_token);
 			}
 		}
+
 		/*
 		 * result đã có đủ cả sensor list nhé
 		 */
@@ -198,7 +194,7 @@ public class WebAPI {
 	}
 
 	/*
-	 * Cập nhật thiết bị
+	 * Cập nhật thiết bị dựa vào jwt của user
 	 */
 	@PutMapping("/api/device")
 	public DeviceDto upDateDevice(@RequestBody DeviceDto device, HttpServletRequest request) {
@@ -212,6 +208,7 @@ public class WebAPI {
 				UserDto user = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(user_token));
 				device.setUserDto(user);
 				result = deviceService.save(device);
+				result.setUserDto(user);
 			}
 		}
 		// result đã có đủ cả sensor list nhé
@@ -219,10 +216,9 @@ public class WebAPI {
 	}
 
 	/*
-	 * Lấy tất cả thông tin của thiết bị
+	 * Lấy tất cả thông tin của thiết bị dựa vào jwt user
 	 * 
 	 */
-	@SuppressWarnings("null")
 	@GetMapping("/api/device/{id}")
 	public DeviceDto getInfoDevice(@PathVariable("id") Long id, HttpServletRequest request) {
 		DeviceDto result = null;
@@ -241,7 +237,7 @@ public class WebAPI {
 	}
 
 	/*
-	 * Generate token device authen(Active device)
+	 * Generate token device authen(Active device) dựa vào jwt user
 	 */
 	@GetMapping("/api/device/{id}/generatetoken")
 	public JwtAuthRequest getGenerateAuthDevice(@PathVariable("id") Long id, HttpServletRequest request) {
@@ -262,7 +258,7 @@ public class WebAPI {
 	}
 
 	/*
-	 * Generate token device collect data
+	 * Generate token device collect data dựa vào jwt user
 	 */
 	@GetMapping("/api/device/{id}/generatetokencollect")
 	public JwtAuthRequest getGenerateTokenCollect(@PathVariable("id") Long id, HttpServletRequest request) {
@@ -309,4 +305,149 @@ public class WebAPI {
 		return result;
 	}
 
+	/*
+	 * Phần liên quan đến admin
+	 */
+
+	/*
+	 * Lấy danh sách user
+	 */
+	@GetMapping("/api/auth/list")
+	public List<UserDto> getAllUser(HttpServletRequest request) {
+		List<UserDto> result = new ArrayList<UserDto>();
+		String user_token = "";
+		String bearerToken = request.getHeader("Authorization");
+		// Kiểm tra xem header Authorization có chứa thông tin jwt không
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			user_token = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(user_token)) {
+				UserDto admin = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(user_token));
+				if (admin.getRoleDto().getCode().equals("ADMIN")) {
+					result = userService.findAll();
+				}
+			}
+		}
+		return result;
+	}
+
+	/*
+	 * Lấy tất cả danh sách device
+	 */
+	@GetMapping("/api/admin/device/list")
+	public List<DeviceDto> getListDeviceByAdmin(HttpServletRequest request) {
+		List<DeviceDto> result = new ArrayList<DeviceDto>();
+		String user_token = "";
+		String token = "";
+		String bearerToken = request.getHeader("Authorization");
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			token = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(token)) {
+				user_token = tokenProvider.getUserNameFromJwtToken(token);
+
+				result = deviceService.getListDeviceByAdmin(user_token);
+
+			}
+		}
+
+		return result;
+	}
+
+	/*
+	 * Thêm mới thiết bị admin thêm
+	 */
+	@PostMapping("/api/admin/device")
+	public JwtAuthRequest saveDeviceByAdmin(@RequestBody DeviceDto device, HttpServletRequest request) {
+		String user_token = "";
+		JwtAuthRequest result = new JwtAuthRequest();
+		String bearerToken = request.getHeader("Authorization");
+		// Kiểm tra xem header Authorization có chứa thông tin jwt không
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			user_token = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(user_token)) {
+				UserDto admin = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(user_token));
+				if (admin.getRoleDto().getCode().equals("ADMIN")) {
+					UserDto user = userService.getUserWithUsername(device.getUserDto().getUsername());
+					device.setUserDto(user);
+					device = deviceService.save(device);
+					result.setDeviceDto(device);
+					result.setDeviceId(device.getId());
+					result.setToken(user_token);
+				}
+			}
+		}
+		return result;
+	}
+
+	/*
+	 * Lấy thông danh sách device ứng với 1 user dựa vào jwt admin
+	 */
+	@GetMapping("/api/admin/{username}/device/list")
+	public List<DeviceDto> getListDeviceUserByAdmin(@PathVariable("username") String username,
+			HttpServletRequest request) {
+		List<DeviceDto> result = new ArrayList<DeviceDto>();
+		@SuppressWarnings("unused")
+		String user_token = "";
+		String token = "";
+		String bearerToken = request.getHeader("Authorization");
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			token = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(token)) {
+				user_token = tokenProvider.getUserNameFromJwtToken(token);
+				result = deviceService.getListDeviceByUser(username);
+			}
+		}
+
+		return result;
+	}
+
+	/*
+	 * Lấy tất cả thông tin của thiết bị dựa vào jwt admin
+	 * 
+	 */
+	@GetMapping("/api/admin/{username}/device/{id}")
+	public DeviceDto getInfoDeviceUserByAdmin(@PathVariable("id") Long id, @PathVariable("username") String username,
+			HttpServletRequest request) {
+		DeviceDto result = null;
+		String user_token = "";
+		String bearerToken = request.getHeader("Authorization");
+		// Kiểm tra xem header Authorization có chứa thông tin jwt không
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			user_token = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(user_token)) {
+				UserDto admin = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(user_token));
+				if (admin != null && admin.getRoleDto().getCode().equals("ADMIN")) {
+					UserDto user = userService.getUserWithUsername(username);
+					result = deviceService.getInfoDevice(id, user.getUsername());
+					result.setUserDto(user);
+				}
+			}
+		}
+		return result;
+	}
+
+	/*
+	 * Cập nhật thiết bị dựa vào jwt của admin
+	 */
+	@PutMapping("/api/admin/{username}/device")
+	public DeviceDto upDateDevice(@RequestBody DeviceDto device, @PathVariable("username") String username,
+			HttpServletRequest request) {
+		DeviceDto result = null;
+		String user_token = "";
+		String bearerToken = request.getHeader("Authorization");
+		// Kiểm tra xem header Authorization có chứa thông tin jwt không
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			user_token = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(user_token)) {
+				UserDto admin = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(user_token));
+				if (admin != null && admin.getRoleDto().getCode().equals("ADMIN")) {
+					UserDto user = userService.getUserWithUsername(username);
+					device.setUserDto(user);
+					result = deviceService.save(device);
+					result.setUserDto(user);
+				}
+			}
+		}
+		// result đã có đủ cả sensor list nhé
+		return result;
+	}
 }

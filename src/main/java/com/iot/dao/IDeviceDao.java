@@ -10,4 +10,5 @@ public interface IDeviceDao extends GenericDao<Long, DeviceEntity>{
 	DeviceEntity findByIdWithProp(Long id, String JOIN_FETCH,int status);
 	void updateKeepAlive(List<Long> ids);
 	List<DeviceEntity> getListDeviceByUser(String username);
+	List<DeviceEntity> getListDeviceByAdmin();
 }

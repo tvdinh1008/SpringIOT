@@ -138,4 +138,19 @@ public class DeviceDao extends AbstractDao<Long, DeviceEntity> implements IDevic
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DeviceEntity> getListDeviceByAdmin() {
+		List<DeviceEntity> result = new ArrayList<DeviceEntity>();
+		try {
+			String sql = "SELECT t from " + getPersistenceClassName()
+					+ " t JOIN FETCH t.userEntity";
+			Query q = entityManager.createQuery(sql);
+			result = q.getResultList();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return result;
+	}
+
 }

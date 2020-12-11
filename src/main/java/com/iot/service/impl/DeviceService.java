@@ -13,10 +13,12 @@ import com.iot.converter.DeviceBeanUtil;
 import com.iot.converter.SensorBeanUtil;
 import com.iot.dao.IDeviceDao;
 import com.iot.dao.ISensorDao;
+import com.iot.dao.IUserDao;
 import com.iot.dto.DeviceDto;
 import com.iot.dto.SensorDto;
 import com.iot.entity.DeviceEntity;
 import com.iot.entity.SensorEntity;
+import com.iot.entity.UserEntity;
 import com.iot.service.IDeviceService;
 
 @Service
@@ -25,7 +27,9 @@ public class DeviceService implements IDeviceService {
 	private IDeviceDao deviceDao;
 	@Autowired
 	private ISensorDao sensorDao;
-
+	@Autowired
+	private IUserDao userDao;
+	
 	@Override
 	public DeviceDto findById(Long id) {
 		return DeviceBeanUtil.entity2Dto(deviceDao.findById(id));
@@ -93,6 +97,18 @@ public class DeviceService implements IDeviceService {
 		DeviceDto result=null;
 		String JOIN_FETCH = "sensorList s JOIN FETCH s.sensorDataList";
 		result=DeviceBeanUtil.entity2Dto( deviceDao.findByIdWithProp(id, JOIN_FETCH, 0), 2);
+		return result;
+	}
+
+	@Override
+	public List<DeviceDto> getListDeviceByAdmin(String username) {
+		List<DeviceDto> result=new ArrayList<DeviceDto>();
+		UserEntity user=userDao.findOneUsername(username);
+		if(user!=null && user.getRoleEntity().getCode().equals("ADMIN")) {
+			for(DeviceEntity entity:deviceDao.getListDeviceByAdmin()) {
+				result.add(DeviceBeanUtil.entity2Dto(entity,0));
+			}
+		}
 		return result;
 	}
 
