@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iot.authentication.JwtTokenProvider;
+import com.iot.authentication.MyUser;
 import com.iot.dto.DeviceDto;
 import com.iot.dto.RoleDto;
 import com.iot.dto.SensorDataDto;
@@ -63,6 +64,9 @@ public class WebAPI {
 		return "Save role false";
 	}
 
+	/*
+	 * Đăng ký
+	 */
 	@PostMapping(value = "/api/auth/signup")
 	private String signUp(@RequestBody UserDto user) {
 		UserDto result = userService.save(user);
@@ -77,6 +81,9 @@ public class WebAPI {
 		return "Save user false";
 	}
 
+	/*
+	 * Đăng nhập
+	 */
 	@PostMapping("/api/auth/signin")
 	public JwtAuthSigninResponse signin(@RequestBody UserDto loginRequest) {
 		Authentication authentication = null;
@@ -89,9 +96,10 @@ public class WebAPI {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
+		MyUser userPrincipal = (MyUser) authentication.getPrincipal();
 		// Trả về jwt cho người dùng.
 		String jwt = tokenProvider.generateJwtTokenUsername(authentication);
-		return new JwtAuthSigninResponse(loginRequest.getUsername(), jwt);
+		return new JwtAuthSigninResponse(userPrincipal, jwt);
 	}
 
 	// cập nhật user
@@ -144,7 +152,29 @@ public class WebAPI {
 		return jwt;
 	}
 
-	// Thêm mới thiết bị
+	/*
+	 * Lấy danh sách device
+	 */
+	@GetMapping("/api/device/list")
+	public List<DeviceDto> getListDeviceByUser(HttpServletRequest request) {
+		List<DeviceDto> result = new ArrayList<DeviceDto>();
+		String user_token = "";
+		String token = "";
+		String bearerToken = request.getHeader("Authorization");
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			token = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(token)) {
+				user_token = tokenProvider.getUserNameFromJwtToken(token);
+				result = deviceService.getListDeviceByUser(user_token);
+			}
+		}
+
+		return result;
+	}
+
+	/*
+	 * Thêm mới thiết bị
+	 */
 	@PostMapping("/api/device")
 	public JwtAuthRequest saveDevice(@RequestBody DeviceDto device, HttpServletRequest request) {
 		String user_token = "";
@@ -167,7 +197,52 @@ public class WebAPI {
 		return result;
 	}
 
-	// Generate token device authen(Active device)
+	/*
+	 * Cập nhật thiết bị
+	 */
+	@PutMapping("/api/device")
+	public DeviceDto upDateDevice(@RequestBody DeviceDto device, HttpServletRequest request) {
+		DeviceDto result = null;
+		String user_token = "";
+		String bearerToken = request.getHeader("Authorization");
+		// Kiểm tra xem header Authorization có chứa thông tin jwt không
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			user_token = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(user_token)) {
+				UserDto user = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(user_token));
+				device.setUserDto(user);
+				result = deviceService.save(device);
+			}
+		}
+		// result đã có đủ cả sensor list nhé
+		return result;
+	}
+
+	/*
+	 * Lấy tất cả thông tin của thiết bị
+	 * 
+	 */
+	@SuppressWarnings("null")
+	@GetMapping("/api/device/{id}")
+	public DeviceDto getInfoDevice(@PathVariable("id") Long id, HttpServletRequest request) {
+		DeviceDto result = null;
+		String user_token = "";
+		String bearerToken = request.getHeader("Authorization");
+		// Kiểm tra xem header Authorization có chứa thông tin jwt không
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			user_token = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(user_token)) {
+				UserDto user = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(user_token));
+				result = deviceService.getInfoDevice(id, user.getUsername());
+				result.setUserDto(user);
+			}
+		}
+		return result;
+	}
+
+	/*
+	 * Generate token device authen(Active device)
+	 */
 	@GetMapping("/api/device/{id}/generatetoken")
 	public JwtAuthRequest getGenerateAuthDevice(@PathVariable("id") Long id, HttpServletRequest request) {
 		String user_token = "";
@@ -186,7 +261,9 @@ public class WebAPI {
 		return result;
 	}
 
-	// Generate token device authen(Active device)
+	/*
+	 * Generate token device collect data
+	 */
 	@GetMapping("/api/device/{id}/generatetokencollect")
 	public JwtAuthRequest getGenerateTokenCollect(@PathVariable("id") Long id, HttpServletRequest request) {
 		String user_token = "";
@@ -205,27 +282,30 @@ public class WebAPI {
 		return result;
 	}
 
+	/*
+	 * Lấy dữ liệu cập nhật lần cuối
+	 */
 	@GetMapping("/api/device/{id}/lastdata")
 	public List<SensorDataDto> getLastDataSensor(@PathVariable("id") Long id) {
 		List<SensorDataDto> result = sensorDataService.findAllDataLastSensorId(id);
 		return result;
 	}
-	/*
-	 * @GetMapping("/api/device/{id}/alldata") public List<SensorDataDto>
-	 * getAllDataSensor(@PathVariable("id") Long id) { List<SensorDataDto> result =
-	 * sensorDataService.findAllDataSensorId(id); return result; }
-	 */
 
+	/*
+	 * Lấy tất cả dữ liệu sensor có status=1 liên quan đến device
+	 */
 	@GetMapping("/api/device/{id}/alldata")
 	public List<SensorDto> getAllDataSensor(@PathVariable("id") Long id) {
 		List<SensorDto> result = sensorService.getAllData(id);
 		return result;
 	}
 
+	/*
+	 * Lấy list sensor đang có status=1 liên quan đến device
+	 */
 	@GetMapping("/api/device/{id}/listsensor")
 	public List<SensorDto> getListSensorOfDevice(@PathVariable("id") Long id) {
 		List<SensorDto> result = new ArrayList<SensorDto>(deviceService.getListSensor(id).getSensorList());
-
 		return result;
 	}
 

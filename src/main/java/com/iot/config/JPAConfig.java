@@ -71,7 +71,7 @@ public class JPAConfig {
 	// Thêm một số thuộc tính khi kết nối tới database
 	public Properties additionalProperties() {
 		Properties properties = new Properties();
-		properties.setProperty("hibernate.hbm2ddl.auto", "update");
+		properties.setProperty("hibernate.hbm2ddl.auto", "none");
 		// properties.setProperty("hibernate.dialect",
 		// "org.hibernate.dialect.SQLServerDialect");
 		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
@@ -80,11 +80,6 @@ public class JPAConfig {
 		properties.setProperty("hibernate.show_sql", "true");
 
 		return properties;
-	}
-
-	@Bean
-	public Hibernate4Module hibernate4Module() {
-		return new Hibernate4Module();
 	}
 
 }

@@ -57,7 +57,7 @@ public class SensorService implements ISensorService {
 		Date time = new Date(collectData.getTime()*1000l - 25200000l);
 		for (DataModel data : collectData.getSensorDataList()) {
 			SensorDataEntity entity = new SensorDataEntity();
-			SensorEntity sensor = sensorDao.findByCode(data.getCode());
+			SensorEntity sensor = sensorDao.findByCode(data.getCode(),collectData.getDeviceId());
 			if (sensor == null || sensor.getStatus() == 0) {
 				continue;
 			}
@@ -73,7 +73,7 @@ public class SensorService implements ISensorService {
 		List<Long> ids = new ArrayList<Long>();
 		//
 		String fetch = "sensorList";
-		DeviceEntity device = deviceDao.findByIdWithProp(deviceid, fetch);
+		DeviceEntity device = deviceDao.findByIdWithProp(deviceid, fetch,1);
 		if (device != null) {
 			for (SensorEntity sensor : device.getSensorList()) {
 				ids.add(sensor.getId());

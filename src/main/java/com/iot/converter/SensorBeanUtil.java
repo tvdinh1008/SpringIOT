@@ -14,15 +14,17 @@ public class SensorBeanUtil {
 		dto.setStatus(entity.getStatus());
 		dto.setCode(entity.getCode());
 		try {
-			if (entity.getDeviceEntity() != null && k != 1) {
+			if (entity.getDeviceEntity() != null && k != 1 && k != 2) {
 				dto.setDeviceDto(DeviceBeanUtil.entity2Dto(entity.getDeviceEntity()));
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 		try {
-			for (SensorDataEntity sensorData : entity.getSensorDataList()) {
-				dto.getSensorDataList().add(SensorDataBeanUtil.entity2Dto(sensorData, 1));
+			if (k != 2) {
+				for (SensorDataEntity sensorData : entity.getSensorDataList()) {
+					dto.getSensorDataList().add(SensorDataBeanUtil.entity2Dto(sensorData, 1));
+				}
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -51,6 +53,13 @@ public class SensorBeanUtil {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
+
+		return entity;
+	}
+
+	public static SensorEntity dto2Entity(SensorDto dto, SensorEntity entity) {
+		entity.setName(dto.getName());
+		entity.setStatus(dto.getStatus());
 
 		return entity;
 	}

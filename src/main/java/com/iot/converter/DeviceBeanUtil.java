@@ -32,6 +32,34 @@ public class DeviceBeanUtil {
 		return dto;
 	}
 
+	public static DeviceDto entity2Dto(DeviceEntity entity, int k) {
+		DeviceDto dto = new DeviceDto();
+		dto.setId(entity.getId());
+		dto.setAlive(entity.getAlive());
+		dto.setName(entity.getName());
+		dto.setCreated_at(entity.getCreated_at());
+		dto.setUpdated_at(entity.getUpdated_at());
+		try {
+			if(entity.getUserEntity()!=null) {
+				dto.setUserDto(UserBeanUtil.entity2Dto(entity.getUserEntity()));
+			}
+		}catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		try {
+			for (SensorEntity sensor : entity.getSensorList()) {
+				int tmp = 2;
+				if (k == 2) {
+					tmp = 1;
+				}
+				dto.getSensorList().add(SensorBeanUtil.entity2Dto(sensor, tmp));
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return dto;
+	}
+
 	public static DeviceEntity dto2Entity(DeviceDto dto) {
 		DeviceEntity entity = new DeviceEntity();
 		entity.setId(dto.getId());
@@ -63,9 +91,9 @@ public class DeviceBeanUtil {
 	 * tính cũ đó
 	 */
 	public static DeviceEntity dto2Entity(DeviceDto dto, DeviceEntity entity) {
-		entity.setId(dto.getId());
+		// entity.setId(dto.getId());
 		entity.setAlive(dto.getAlive());
-		entity.setCreated_at(dto.getCreated_at());
+		// entity.setCreated_at(dto.getCreated_at());
 		entity.setUpdated_at(dto.getUpdated_at());
 		entity.setName(dto.getName());
 		return entity;

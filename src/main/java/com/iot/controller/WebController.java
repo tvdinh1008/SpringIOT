@@ -19,8 +19,8 @@ import com.iot.service.IRoleService;
 
 @Controller
 public class WebController {
-	@Autowired
-	private MqttPahoMessageHandler mqtt;
+	//@Autowired
+	///private MqttPahoMessageHandler mqtt;
 	
 	@Autowired
 	private IRoleService roleService;
@@ -28,9 +28,9 @@ public class WebController {
 	
 	@RequestMapping(value = "/trang-chu", method = RequestMethod.GET)
 	public ModelAndView getHomePage() throws MqttPersistenceException, MqttException {
-		String data = "Hế lo các bạn nhé !!!";
-		Message<String> message = MessageBuilder.withPayload(data).setHeader(MqttHeaders.TOPIC, "demotopic").build();
-		mqtt.handleMessage(message);
+		//String data = "Hế lo các bạn nhé !!!";
+		//Message<String> message = MessageBuilder.withPayload(data).setHeader(MqttHeaders.TOPIC, "demotopic").build();
+		//mqtt.handleMessage(message);
 		return new ModelAndView("web/home");
 	}
 

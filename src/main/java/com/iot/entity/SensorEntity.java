@@ -23,7 +23,7 @@ public class SensorEntity {
 	@Column(name = "name", columnDefinition = "nvarchar(250)")
 	private String name;
 
-	@Column(name = "code", columnDefinition = "nvarchar(250)")
+	@Column(name="code", columnDefinition = "nvarchar(250) NOT NULL UNIQUE")
 	private String code;
 	@Column(name = "status")
 	private Integer status;

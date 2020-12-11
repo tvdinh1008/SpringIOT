@@ -86,7 +86,7 @@ public class MQTTConfig {
 	@Bean
 	public MqttPahoClientFactory mqttClientFactory() {
 		DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
-		factory.setServerURIs(new String[] { "tcp://mqtt.eclipse.org:1883" });
+		factory.setServerURIs(new String[] { "tcp://broker.hivemq.com:1883" });
 		factory.setUserName("username");
 		factory.setPassword("password");
 		factory.setCleanSession(true);

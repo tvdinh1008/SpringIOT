@@ -40,12 +40,13 @@ public class SensorDao extends AbstractDao<Long, SensorEntity> implements ISenso
 	}
 
 	@Override
-	public SensorEntity findByCode(String code) {
+	public SensorEntity findByCode(String code,Long deviceId) {
 		SensorEntity entity = null;
 		try {
-			String sql = "Select * from sensor t where t.code=:code and t.status=1";
-			Query q = entityManager.createNativeQuery(sql, SensorEntity.class);
+			String sql = "Select t from " + getPersistenceClassName()+" t JOIN FETCH t.deviceEntity d where t.code=:code and t.status=1 and d.id=:id";
+			Query q = entityManager.createQuery(sql);
 			q.setParameter("code", code);
+			q.setParameter("id", deviceId);
 			entity = (SensorEntity) q.getSingleResult();
 		} catch (Exception e) {
 			logger.error(e.getMessage());

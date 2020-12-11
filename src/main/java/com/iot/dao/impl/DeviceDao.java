@@ -1,5 +1,6 @@
 package com.iot.dao.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,18 +50,22 @@ public class DeviceDao extends AbstractDao<Long, DeviceEntity> implements IDevic
 	}
 
 	@Override
-	public DeviceEntity findByIdWithProp(Long id, String JOIN_FETCH) {
+	public DeviceEntity findByIdWithProp(Long id, String JOIN_FETCH, int status) {
 		DeviceEntity result = null;
+		String sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t." + JOIN_FETCH
+				+ " where t.id=:id";
+		if (status == 1) {
+			sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t." + JOIN_FETCH
+					+ " s where t.id=:id and s.status=1";
+		}
 		try {
-			String sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t." + JOIN_FETCH
-					+ " where t.id=:id";
-
 			Query q = entityManager.createQuery(sql);
 			q.setParameter("id", id);
 			result = (DeviceEntity) q.getSingleResult();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
+
 		return result;
 	}
 
@@ -68,9 +73,10 @@ public class DeviceDao extends AbstractDao<Long, DeviceEntity> implements IDevic
 	@Override
 	public void updateKeepAlive(List<Long> ids) {
 		try {
-			Query q =null;
+			Query q = null;
 			if (ids.size() != 0) {
-				String sql1 = "UPDATE " + getPersistenceClassName() + " e SET e.alive=1,e.updated_at=:datenow where e.id IN(";
+				String sql1 = "UPDATE " + getPersistenceClassName()
+						+ " e SET e.alive=1,e.updated_at=:datenow where e.id IN(";
 				int flag = 0;
 				for (Long id : ids) {
 					if (flag == 0) {
@@ -81,14 +87,15 @@ public class DeviceDao extends AbstractDao<Long, DeviceEntity> implements IDevic
 					}
 				}
 				sql1 += ")";
-				
+
 				/*
 				 * chỉ cập nhật những thằng nào alive=1 khi mà ko thuộc IN
 				 */
 				q = entityManager.createQuery(sql1);
 				q.setParameter("datenow", new Date());
 				q.executeUpdate();
-				String sql2 = "UPDATE " + getPersistenceClassName() + " e SET e.alive=0,e.updated_at=:datenow where e.id NOT IN(";
+				String sql2 = "UPDATE " + getPersistenceClassName()
+						+ " e SET e.alive=0,e.updated_at=:datenow where e.id NOT IN(";
 				flag = 0;
 				for (Long id : ids) {
 					if (flag == 0) {
@@ -103,8 +110,9 @@ public class DeviceDao extends AbstractDao<Long, DeviceEntity> implements IDevic
 				q.setParameter("datenow", new Date());
 				q.executeUpdate();
 			} else {
-				String sql1 = "UPDATE " + getPersistenceClassName() + " e SET e.alive=0, e.updated_at=:datenow where e.alive !=0";
-				q=entityManager.createQuery(sql1);
+				String sql1 = "UPDATE " + getPersistenceClassName()
+						+ " e SET e.alive=0, e.updated_at=:datenow where e.alive !=0";
+				q = entityManager.createQuery(sql1);
 				q.setParameter("datenow", new Date());
 				q.executeUpdate();
 			}
@@ -112,6 +120,22 @@ public class DeviceDao extends AbstractDao<Long, DeviceEntity> implements IDevic
 			logger.error(e.getMessage());
 		}
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DeviceEntity> getListDeviceByUser(String username) {
+		List<DeviceEntity> result = new ArrayList<DeviceEntity>();
+		try {
+			String sql = "SELECT t from " + getPersistenceClassName()
+					+ " t JOIN FETCH t.userEntity u where u.username=:username";
+			Query q = entityManager.createQuery(sql);
+			q.setParameter("username", username);
+			result = q.getResultList();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return result;
 	}
 
 }

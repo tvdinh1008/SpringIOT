@@ -1,6 +1,8 @@
 package com.iot.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.transaction.Transactional;
 
@@ -8,9 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.iot.converter.DeviceBeanUtil;
+import com.iot.converter.SensorBeanUtil;
 import com.iot.dao.IDeviceDao;
 import com.iot.dao.ISensorDao;
 import com.iot.dto.DeviceDto;
+import com.iot.dto.SensorDto;
 import com.iot.entity.DeviceEntity;
 import com.iot.entity.SensorEntity;
 import com.iot.service.IDeviceService;
@@ -32,7 +36,18 @@ public class DeviceService implements IDeviceService {
 	public DeviceDto save(DeviceDto dto) {
 		DeviceDto result = null;
 		if (dto != null && dto.getId() != null) {
-			// cập nhật device
+			DeviceEntity entity=deviceDao.findById(dto.getId());
+			dto.setUpdated_at(new Date());
+			entity=DeviceBeanUtil.dto2Entity(dto, entity);
+			deviceDao.update(entity);
+			for(SensorDto sensor:dto.getSensorList()) {
+				SensorEntity sensorEntity=sensorDao.findById(sensor.getId());
+				sensorEntity=SensorBeanUtil.dto2Entity(sensor, sensorEntity);
+				sensorDao.update(sensorEntity);
+			}
+			String JOIN_FETCH = "sensorList";
+			entity=deviceDao.findByIdWithProp(entity.getId(), JOIN_FETCH, 0);
+			result=DeviceBeanUtil.entity2Dto(entity,1);
 
 		} else if (dto != null && dto.getId() == null) {
 			dto.setCreated_at(new Date());
@@ -45,6 +60,9 @@ public class DeviceService implements IDeviceService {
 					sensor.setDeviceEntity(entity);
 					sensorDao.save(sensor);
 				}
+				/*
+				 * Khi save thì listSensor của result cũng đã được gắn luôn id
+				 */
 				result=DeviceBeanUtil.entity2Dto(entity);
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
@@ -57,7 +75,24 @@ public class DeviceService implements IDeviceService {
 	public DeviceDto getListSensor(Long id) {
 		DeviceDto result = null;
 		String JOIN_FETCH = "sensorList";
-		result = DeviceBeanUtil.entity2Dto(deviceDao.findByIdWithProp(id, JOIN_FETCH));
+		result = DeviceBeanUtil.entity2Dto(deviceDao.findByIdWithProp(id, JOIN_FETCH,1));
+		return result;
+	}
+
+	@Override
+	public List<DeviceDto> getListDeviceByUser(String username) {
+		List<DeviceDto> result=new ArrayList<DeviceDto>();
+		for(DeviceEntity entity:deviceDao.getListDeviceByUser(username)) {
+			result.add(DeviceBeanUtil.entity2Dto(entity,0));
+		}
+		return result;
+	}
+
+	@Override
+	public DeviceDto getInfoDevice(Long id, String username) {
+		DeviceDto result=null;
+		String JOIN_FETCH = "sensorList s JOIN FETCH s.sensorDataList";
+		result=DeviceBeanUtil.entity2Dto( deviceDao.findByIdWithProp(id, JOIN_FETCH, 0), 2);
 		return result;
 	}
 

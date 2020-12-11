@@ -1,24 +1,30 @@
 package com.iot.payloads;
 
+import com.iot.authentication.MyUser;
+
 public class JwtAuthSigninResponse {
-	String username;
+	MyUser user;
 	String jwt;
-	
-	public JwtAuthSigninResponse(String username, String jwt) {
-		this.username = username;
+
+	public JwtAuthSigninResponse(MyUser user, String jwt) {
+		this.user = user;
 		this.jwt = jwt;
 	}
-	public String getUsername() {
-		return username;
+
+	public MyUser getUser() {
+		return user;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+
+	public void setUser(MyUser user) {
+		this.user = user;
 	}
+
 	public String getJwt() {
 		return jwt;
 	}
+
 	public void setJwt(String jwt) {
 		this.jwt = jwt;
 	}
-	
+
 }
