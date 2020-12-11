@@ -50,7 +50,7 @@ public class DeviceService implements IDeviceService {
 				sensorDao.update(sensorEntity);
 			}
 			String JOIN_FETCH = "sensorList";
-			entity=deviceDao.findByIdWithProp(entity.getId(), JOIN_FETCH, 0);
+			entity=deviceDao.findByIdWithProp(entity.getId(), JOIN_FETCH, 0,"");
 			result=DeviceBeanUtil.entity2Dto(entity,1);
 
 		} else if (dto != null && dto.getId() == null) {
@@ -79,7 +79,7 @@ public class DeviceService implements IDeviceService {
 	public DeviceDto getListSensor(Long id) {
 		DeviceDto result = null;
 		String JOIN_FETCH = "sensorList";
-		result = DeviceBeanUtil.entity2Dto(deviceDao.findByIdWithProp(id, JOIN_FETCH,1));
+		result = DeviceBeanUtil.entity2Dto(deviceDao.findByIdWithProp(id, JOIN_FETCH,1,""));
 		return result;
 	}
 
@@ -96,7 +96,7 @@ public class DeviceService implements IDeviceService {
 	public DeviceDto getInfoDevice(Long id, String username) {
 		DeviceDto result=null;
 		String JOIN_FETCH = "sensorList s LEFT JOIN FETCH s.sensorDataList";
-		result=DeviceBeanUtil.entity2Dto( deviceDao.findByIdWithProp(id, JOIN_FETCH, 0), 2);
+		result=DeviceBeanUtil.entity2Dto( deviceDao.findByIdWithProp(id, JOIN_FETCH, 0, username), 2);
 		return result;
 	}
 

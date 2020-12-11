@@ -29,7 +29,7 @@ public class SensorDataService implements ISensorDataService{
 		List<Long> ids=new ArrayList<Long>();
 		//
 		String fetch="sensorList";
-		DeviceEntity device=deviceDao.findByIdWithProp(deviceID, fetch,1);
+		DeviceEntity device=deviceDao.findByIdWithProp(deviceID, fetch,1,"");
 		if(device!=null) {
 			for(SensorEntity sensor: device.getSensorList()) {
 				ids.add(sensor.getId());
@@ -48,7 +48,7 @@ public class SensorDataService implements ISensorDataService{
 		List<Long> ids=new ArrayList<Long>();
 		//
 		String fetch="sensorList";
-		DeviceEntity device=deviceDao.findByIdWithProp(deviceID, fetch,1);
+		DeviceEntity device=deviceDao.findByIdWithProp(deviceID, fetch,1,"");
 		if(device!=null) {
 			for(SensorEntity sensor: device.getSensorList()) {
 				ids.add(sensor.getId());

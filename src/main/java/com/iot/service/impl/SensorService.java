@@ -73,7 +73,7 @@ public class SensorService implements ISensorService {
 		List<Long> ids = new ArrayList<Long>();
 		//
 		String fetch = "sensorList";
-		DeviceEntity device = deviceDao.findByIdWithProp(deviceid, fetch,1);
+		DeviceEntity device = deviceDao.findByIdWithProp(deviceid, fetch,1,"");
 		if (device != null) {
 			for (SensorEntity sensor : device.getSensorList()) {
 				ids.add(sensor.getId());

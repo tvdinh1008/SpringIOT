@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import com.iot.dao.IDeviceDao;
@@ -50,22 +51,38 @@ public class DeviceDao extends AbstractDao<Long, DeviceEntity> implements IDevic
 	}
 
 	@Override
-	public DeviceEntity findByIdWithProp(Long id, String JOIN_FETCH, int status) {
+	public DeviceEntity findByIdWithProp(Long id, String JOIN_FETCH, int status, String username) {
 		DeviceEntity result = null;
-		String sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t." + JOIN_FETCH
-				+ " where t.id=:id";
-		if (status == 1) {
-			sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t." + JOIN_FETCH
-					+ " s where t.id=:id and s.status=1";
+		if (StringUtils.isNotBlank(username)) {
+			String sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t." + JOIN_FETCH
+					+ " JOIN FETCH t.userEntity u where t.id=:id and u.username=:username";
+			if (status == 1) {
+				sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t." + JOIN_FETCH
+						+ " s JOIN FETCH t.userEntity u where t.id=:id and s.status=1 and u.username=:username";
+			}
+			try {
+				Query q = entityManager.createQuery(sql);
+				q.setParameter("id", id);
+				q.setParameter("username", username);
+				result = (DeviceEntity) q.getSingleResult();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			}
+		} else {
+			String sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t." + JOIN_FETCH
+					+ " where t.id=:id";
+			if (status == 1) {
+				sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t." + JOIN_FETCH
+						+ " s where t.id=:id and s.status=1";
+			}
+			try {
+				Query q = entityManager.createQuery(sql);
+				q.setParameter("id", id);
+				result = (DeviceEntity) q.getSingleResult();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			}
 		}
-		try {
-			Query q = entityManager.createQuery(sql);
-			q.setParameter("id", id);
-			result = (DeviceEntity) q.getSingleResult();
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-		}
-
 		return result;
 	}
 
@@ -143,8 +160,7 @@ public class DeviceDao extends AbstractDao<Long, DeviceEntity> implements IDevic
 	public List<DeviceEntity> getListDeviceByAdmin() {
 		List<DeviceEntity> result = new ArrayList<DeviceEntity>();
 		try {
-			String sql = "SELECT t from " + getPersistenceClassName()
-					+ " t JOIN FETCH t.userEntity";
+			String sql = "SELECT t from " + getPersistenceClassName() + " t JOIN FETCH t.userEntity";
 			Query q = entityManager.createQuery(sql);
 			result = q.getResultList();
 		} catch (Exception e) {
