@@ -28,3 +28,7 @@ Mô hình MVC trong Spring và luồng dữ liệu chạy: View -> controller ->
     + 
 
 - Để khắc phục lỗi:"Could not write JSON: could not initialize proxy - no Session; nested exception is com.fasterxml.jackson.databind.JsonMappingException: could not initialize proxy - no Session"   Xẩy ra khi ta để fetch.LAZY ở prop trong class. Điều này xẩy ra là do JSON cố load LAZY nhưng nó đã kết thúc "trans". Do đó có vài cách khắc phục như thêm từ khóa @JsonIgnore ở prop có LAZY hoặc ta sẽ sử dụng "JOIN FETCH" để lấy cả dữ liệu của nó lên. Nhưng có cách đơn giản hơn là ta sẽ sử dụng 1 lớp nữa là DTO. trong lớp này ta sẽ bắt try{ những cái mà set, get LAZY) =>nó sẽ xẩy ra lỗi "could not initialize proxy - no Session" nhưng do bắt try rồi nên nó vẫn vượt qua được và lúc JSON gọi thì trả ở DTO (thay vì entity)
+
+- Để lấy dữ liệu từ 3 bảng: Device-Sensor-DataSensor. Nếu ta để là Select t from DeviceEntity t sensorList s JOIN FETCH s.sensorDataList.
+    + Nó sẽ xấy ra TH đặc biệt là Datasensor ko có gì thì nó sẽ ko query được vì dùng inner join
+    + Khắc phục để là  Select t from DeviceEntity t sensorList s LEFT JOIN FETCH s.sensorDataList.
