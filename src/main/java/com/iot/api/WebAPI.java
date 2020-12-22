@@ -85,13 +85,6 @@ public class WebAPI {
 		return new JwtAuthResponse(userPrincipal, jwt);
 	}
 
-	// cập nhật user
-	@PutMapping("/api/auth")
-	public UserDto updateUser(@RequestBody UserDto user) {
-		UserDto result = userService.save(user);
-		return result;
-	}
-
 	// thêm mới user
 	@PostMapping(value = "/api/auth")
 	private UserDto register(@RequestBody UserDto user) {
@@ -432,17 +425,17 @@ public class WebAPI {
 	 */
 	@PostMapping(value = "/api/admin/auth/signup")
 	private JwtAuthResponse signUp(@RequestBody UserDto user, HttpServletRequest request) {
-		JwtAuthResponse response=new JwtAuthResponse();
+		JwtAuthResponse response = new JwtAuthResponse();
 		String bearerToken = request.getHeader("Authorization");
 		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-			String adminToken=bearerToken.substring(7);
+			String adminToken = bearerToken.substring(7);
 			if (tokenProvider.validateJwtToken(adminToken)) {
 				UserDto admin = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(adminToken));
 				if (admin != null && admin.getRoleDto().getCode().equals("ADMIN")) {
 					UserDto result = userService.save(user);
 					if (result != null) {
-						Authentication authentication = authenticationManager
-								.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+						Authentication authentication = authenticationManager.authenticate(
+								new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
 						SecurityContextHolder.getContext().setAuthentication(authentication);
 						String jwt = tokenProvider.generateJwtTokenUsername(authentication);
 						MyUser userPrincipal = (MyUser) authentication.getPrincipal();
@@ -454,13 +447,13 @@ public class WebAPI {
 		}
 		return response;
 	}
-	
+
 	// xóa user
 	@DeleteMapping(value = "/api/admin/auth")
 	public Boolean deleteUser(@RequestBody Long[] ids, HttpServletRequest request) {
 		String bearerToken = request.getHeader("Authorization");
 		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-			String adminToken=bearerToken.substring(7);
+			String adminToken = bearerToken.substring(7);
 			if (tokenProvider.validateJwtToken(adminToken)) {
 				UserDto admin = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(adminToken));
 				if (admin != null && admin.getRoleDto().getCode().equals("ADMIN")) {
@@ -469,6 +462,23 @@ public class WebAPI {
 			}
 		}
 		return false;
+	}
+
+	// cập nhật user
+	@PutMapping("/api/admin/auth")
+	public UserDto updateUser(@RequestBody UserDto user, HttpServletRequest request) {
+		UserDto result = null;
+		String bearerToken = request.getHeader("Authorization");
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			String adminToken = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(adminToken)) {
+				UserDto admin = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(adminToken));
+				if (admin != null && admin.getRoleDto().getCode().equals("ADMIN")) {
+					result = userService.save(user);
+				}
+			}
+		}
+		return result;
 	}
 
 }
