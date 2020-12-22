@@ -9,4 +9,5 @@ public interface IUserService {
 	List<UserDto> findAll();
 	UserDto getUserWithUsername(String username);
 	UserDto findById(Long id);
+	Boolean deleteUser(Long[] ids);
 }

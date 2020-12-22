@@ -28,7 +28,7 @@ import com.iot.dto.SensorDataDto;
 import com.iot.dto.SensorDto;
 import com.iot.dto.UserDto;
 import com.iot.payloads.JwtAuthRequest;
-import com.iot.payloads.JwtAuthSigninResponse;
+import com.iot.payloads.JwtAuthResponse;
 import com.iot.service.IDeviceService;
 import com.iot.service.IRoleService;
 import com.iot.service.ISensorDataService;
@@ -65,27 +65,10 @@ public class WebAPI {
 	}
 
 	/*
-	 * Đăng ký
-	 */
-	@PostMapping(value = "/api/auth/signup")
-	private String signUp(@RequestBody UserDto user) {
-		UserDto result = userService.save(user);
-		if (result != null) {
-			Authentication authentication = authenticationManager
-					.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-			String jwt = tokenProvider.generateJwtTokenUsername(authentication);
-			String token = "token: " + jwt;
-			return token;
-		}
-		return "Save user false";
-	}
-
-	/*
 	 * Đăng nhập
 	 */
 	@PostMapping("/api/auth/signin")
-	public JwtAuthSigninResponse signin(@RequestBody UserDto loginRequest) {
+	public JwtAuthResponse signin(@RequestBody UserDto loginRequest) {
 		Authentication authentication = null;
 		try {
 			authentication = authenticationManager.authenticate(
@@ -99,7 +82,7 @@ public class WebAPI {
 		MyUser userPrincipal = (MyUser) authentication.getPrincipal();
 		// Trả về jwt cho người dùng.
 		String jwt = tokenProvider.generateJwtTokenUsername(authentication);
-		return new JwtAuthSigninResponse(userPrincipal, jwt);
+		return new JwtAuthResponse(userPrincipal, jwt);
 	}
 
 	// cập nhật user
@@ -120,13 +103,6 @@ public class WebAPI {
 	@GetMapping("/api/auth/{id}")
 	public UserDto getProfile(@PathVariable("id") Long id) {
 		return userService.findById(id);
-	}
-
-	// xóa user
-	@DeleteMapping("/api/auth")
-	public Boolean deleteUser(@RequestBody Long[] ids) {
-		System.out.println("Delete ok " + ids[0]);
-		return null;
 	}
 
 	// Generate TokenUser
@@ -450,4 +426,49 @@ public class WebAPI {
 		// result đã có đủ cả sensor list nhé
 		return result;
 	}
+
+	/*
+	 * Đăng ký
+	 */
+	@PostMapping(value = "/api/admin/auth/signup")
+	private JwtAuthResponse signUp(@RequestBody UserDto user, HttpServletRequest request) {
+		JwtAuthResponse response=new JwtAuthResponse();
+		String bearerToken = request.getHeader("Authorization");
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			String adminToken=bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(adminToken)) {
+				UserDto admin = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(adminToken));
+				if (admin != null && admin.getRoleDto().getCode().equals("ADMIN")) {
+					UserDto result = userService.save(user);
+					if (result != null) {
+						Authentication authentication = authenticationManager
+								.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+						SecurityContextHolder.getContext().setAuthentication(authentication);
+						String jwt = tokenProvider.generateJwtTokenUsername(authentication);
+						MyUser userPrincipal = (MyUser) authentication.getPrincipal();
+						response.setJwt(jwt);
+						response.setUser(userPrincipal);
+					}
+				}
+			}
+		}
+		return response;
+	}
+	
+	// xóa user
+	@DeleteMapping(value = "/api/admin/auth")
+	public Boolean deleteUser(@RequestBody Long[] ids, HttpServletRequest request) {
+		String bearerToken = request.getHeader("Authorization");
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			String adminToken=bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(adminToken)) {
+				UserDto admin = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(adminToken));
+				if (admin != null && admin.getRoleDto().getCode().equals("ADMIN")) {
+					return userService.deleteUser(ids);
+				}
+			}
+		}
+		return false;
+	}
+
 }

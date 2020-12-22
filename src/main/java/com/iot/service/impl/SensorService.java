@@ -52,12 +52,13 @@ public class SensorService implements ISensorService {
 	@Override
 	public void saveCollectData(CollectDataModel collectData) {
 		/*
-		 * Gửi là múi giờ thứ 7 (tức 7*60*60=25200) mà hàm dưới tự lấy múi giờ của mình(+7) =>Bị cộng 2 lần múi giờ thứ 7
+		 * Gửi là múi giờ thứ 7 (tức 7*60*60=25200) mà hàm dưới tự lấy múi giờ của
+		 * mình(+7) =>Bị cộng 2 lần múi giờ thứ 7
 		 */
-		Date time = new Date(collectData.getTime()*1000l - 25200000l);
+		Date time = new Date(collectData.getTime() * 1000l - 25200000l);
 		for (DataModel data : collectData.getSensorDataList()) {
 			SensorDataEntity entity = new SensorDataEntity();
-			SensorEntity sensor = sensorDao.findByCode(data.getCode(),collectData.getDeviceId());
+			SensorEntity sensor = sensorDao.findByCode(data.getCode(), collectData.getDeviceId());
 			if (sensor == null || sensor.getStatus() == 0) {
 				continue;
 			}
@@ -71,20 +72,24 @@ public class SensorService implements ISensorService {
 	@Override
 	public List<SensorDto> getAllData(Long deviceid) {
 		List<Long> ids = new ArrayList<Long>();
-		//
-		String fetch = "sensorList";
-		DeviceEntity device = deviceDao.findByIdWithProp(deviceid, fetch,1,"");
-		if (device != null) {
-			for (SensorEntity sensor : device.getSensorList()) {
-				ids.add(sensor.getId());
-			}
-		}
 		List<SensorDto> result = new ArrayList<SensorDto>();
-		for (Long id : ids) {
-			SensorEntity entity = sensorDao.findAllDataSensor(id);
-			if (entity != null) {
-				result.add(SensorBeanUtil.entity2Dto(entity, 0));
+		//
+		try {
+			String fetch = "sensorList";
+			DeviceEntity device = deviceDao.findByIdWithProp(deviceid, fetch, 1, "");
+			if (device != null) {
+				for (SensorEntity sensor : device.getSensorList()) {
+					ids.add(sensor.getId());
+				}
 			}
+			for (Long id : ids) {
+				SensorEntity entity = sensorDao.findAllDataSensor(id);
+				if (entity != null) {
+					result.add(SensorBeanUtil.entity2Dto(entity, 0));
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 
 		return result;

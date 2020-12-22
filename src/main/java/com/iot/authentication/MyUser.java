@@ -22,7 +22,8 @@ public class MyUser extends User {
 	// do class User do Spring viết chỉ có username,password nên ta custom lại thêm
 	// tên,...
 	private String fullName;
-
+	private Long id;
+	
 	public String getFullName() {
 		return fullName;
 	}
@@ -31,4 +32,12 @@ public class MyUser extends User {
 		this.fullName = fullName;
 	}
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
 }

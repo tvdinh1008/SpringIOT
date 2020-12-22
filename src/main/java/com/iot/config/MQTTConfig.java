@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iot.authentication.JwtTokenProvider;
 import com.iot.dao.IDeviceDao;
 import com.iot.entity.DeviceEntity;
+import com.iot.mqtt.AuthResponse;
 import com.iot.mqtt.CollectDataModel;
 import com.iot.mqtt.KeepAliveMessageModel;
 import com.iot.payloads.JwtAuthRequest;
@@ -139,7 +140,7 @@ public class MQTTConfig {
 								device.setAlive(1);
 								if (deviceDao.update(device) != null) {
 									// nếu xác thực thành công
-									JwtAuthResponse data = new JwtAuthResponse();
+									AuthResponse data = new AuthResponse();
 									data.setToken(jwt);
 									data.setId(device.getId());
 									data.setReply("true");

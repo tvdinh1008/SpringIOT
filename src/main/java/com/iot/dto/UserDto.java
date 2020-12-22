@@ -14,7 +14,6 @@ public class UserDto implements Serializable {
 	private String password;
 	private int status;
 	private Date create_time;
-	private Date last_login;
 	private RoleDto roleDto;
 
 	public Long getId() {
@@ -71,14 +70,6 @@ public class UserDto implements Serializable {
 
 	public void setCreate_time(Date create_time) {
 		this.create_time = create_time;
-	}
-
-	public Date getLast_login() {
-		return last_login;
-	}
-
-	public void setLast_login(Date last_login) {
-		this.last_login = last_login;
 	}
 
 	public RoleDto getRoleDto() {

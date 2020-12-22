@@ -29,7 +29,7 @@ public class DeviceService implements IDeviceService {
 	private ISensorDao sensorDao;
 	@Autowired
 	private IUserDao userDao;
-	
+
 	@Override
 	public DeviceDto findById(Long id) {
 		return DeviceBeanUtil.entity2Dto(deviceDao.findById(id));
@@ -40,18 +40,18 @@ public class DeviceService implements IDeviceService {
 	public DeviceDto save(DeviceDto dto) {
 		DeviceDto result = null;
 		if (dto != null && dto.getId() != null) {
-			DeviceEntity entity=deviceDao.findById(dto.getId());
+			DeviceEntity entity = deviceDao.findById(dto.getId());
 			dto.setUpdated_at(new Date());
-			entity=DeviceBeanUtil.dto2Entity(dto, entity);
+			entity = DeviceBeanUtil.dto2Entity(dto, entity);
 			deviceDao.update(entity);
-			for(SensorDto sensor:dto.getSensorList()) {
-				SensorEntity sensorEntity=sensorDao.findById(sensor.getId());
-				sensorEntity=SensorBeanUtil.dto2Entity(sensor, sensorEntity);
+			for (SensorDto sensor : dto.getSensorList()) {
+				SensorEntity sensorEntity = sensorDao.findById(sensor.getId());
+				sensorEntity = SensorBeanUtil.dto2Entity(sensor, sensorEntity);
 				sensorDao.update(sensorEntity);
 			}
 			String JOIN_FETCH = "sensorList";
-			entity=deviceDao.findByIdWithProp(entity.getId(), JOIN_FETCH, 0,"");
-			result=DeviceBeanUtil.entity2Dto(entity,1);
+			entity = deviceDao.findByIdWithProp(entity.getId(), JOIN_FETCH, 0, "");
+			result = DeviceBeanUtil.entity2Dto(entity, 1);
 
 		} else if (dto != null && dto.getId() == null) {
 			dto.setCreated_at(new Date());
@@ -60,14 +60,14 @@ public class DeviceService implements IDeviceService {
 				DeviceEntity entity = DeviceBeanUtil.dto2Entity(dto);
 				entity = deviceDao.save(entity);
 				// String code[]= {"SENSOR1","SENSOR2","SENSOR3","SENSOR4","SENSOR5"};
-				for(SensorEntity sensor:entity.getSensorList()) {
+				for (SensorEntity sensor : entity.getSensorList()) {
 					sensor.setDeviceEntity(entity);
 					sensorDao.save(sensor);
 				}
 				/*
 				 * Khi save thì listSensor của result cũng đã được gắn luôn id
 				 */
-				result=DeviceBeanUtil.entity2Dto(entity);
+				result = DeviceBeanUtil.entity2Dto(entity);
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
@@ -78,36 +78,48 @@ public class DeviceService implements IDeviceService {
 	@Override
 	public DeviceDto getListSensor(Long id) {
 		DeviceDto result = null;
-		String JOIN_FETCH = "sensorList";
-		result = DeviceBeanUtil.entity2Dto(deviceDao.findByIdWithProp(id, JOIN_FETCH,1,""));
+		try {
+			String JOIN_FETCH = "sensorList";
+			result = DeviceBeanUtil.entity2Dto(deviceDao.findByIdWithProp(id, JOIN_FETCH, 1, ""));
+		} catch (Exception e) {
+		}
 		return result;
 	}
 
 	@Override
 	public List<DeviceDto> getListDeviceByUser(String username) {
-		List<DeviceDto> result=new ArrayList<DeviceDto>();
-		for(DeviceEntity entity:deviceDao.getListDeviceByUser(username)) {
-			result.add(DeviceBeanUtil.entity2Dto(entity,0));
+		List<DeviceDto> result = new ArrayList<DeviceDto>();
+		try {
+			for (DeviceEntity entity : deviceDao.getListDeviceByUser(username)) {
+				result.add(DeviceBeanUtil.entity2Dto(entity, 0));
+			}
+		} catch (Exception e) {
 		}
 		return result;
 	}
 
 	@Override
 	public DeviceDto getInfoDevice(Long id, String username) {
-		DeviceDto result=null;
-		String JOIN_FETCH = "sensorList s LEFT JOIN FETCH s.sensorDataList";
-		result=DeviceBeanUtil.entity2Dto( deviceDao.findByIdWithProp(id, JOIN_FETCH, 0, username), 2);
+		DeviceDto result = null;
+		try {
+			String JOIN_FETCH = "sensorList s LEFT JOIN FETCH s.sensorDataList";
+			result = DeviceBeanUtil.entity2Dto(deviceDao.findByIdWithProp(id, JOIN_FETCH, 0, username), 2);
+		} catch (Exception e) {
+		}
 		return result;
 	}
 
 	@Override
 	public List<DeviceDto> getListDeviceByAdmin(String username) {
-		List<DeviceDto> result=new ArrayList<DeviceDto>();
-		UserEntity user=userDao.findOneUsername(username);
-		if(user!=null && user.getRoleEntity().getCode().equals("ADMIN")) {
-			for(DeviceEntity entity:deviceDao.getListDeviceByAdmin()) {
-				result.add(DeviceBeanUtil.entity2Dto(entity,0));
+		List<DeviceDto> result = new ArrayList<DeviceDto>();
+		try {
+			UserEntity user = userDao.findOneUsername(username);
+			if (user != null && user.getRoleEntity().getCode().equals("ADMIN")) {
+				for (DeviceEntity entity : deviceDao.getListDeviceByAdmin()) {
+					result.add(DeviceBeanUtil.entity2Dto(entity, 0));
+				}
 			}
+		} catch (Exception e) {
 		}
 		return result;
 	}

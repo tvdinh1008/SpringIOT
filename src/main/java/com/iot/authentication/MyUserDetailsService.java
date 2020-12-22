@@ -39,7 +39,7 @@ public class MyUserDetailsService implements UserDetailsService {
 		// UserDetails nên ta có thể return myUser
 		MyUser myUser = new MyUser(user.getUsername(), user.getPassword(), true, true, true, true, authorities);
 		myUser.setFullName(user.getFull_name());
-
+		myUser.setId(user.getId());
 		return myUser;
 	}
 

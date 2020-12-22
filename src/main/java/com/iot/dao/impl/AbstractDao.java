@@ -7,16 +7,17 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.RollbackException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import com.iot.dao.GenericDao;
 
 import javassist.tools.rmi.ObjectNotFoundException;
 
-@Transactional
 public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T> {
 	@PersistenceContext
 	protected EntityManager entityManager;
@@ -53,6 +54,7 @@ public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T
 		return result;
 	}
 
+	@Transactional
 	@SuppressWarnings("unchecked")
 	@Override
 	public T update(T entity) {
@@ -65,7 +67,8 @@ public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T
 		}
 		return result;
 	}
-
+	
+	@Transactional
 	@Override
 	public T save(T entity) {
 		try {
@@ -76,7 +79,7 @@ public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T
 		}
 		return entity;
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public T findById(ID var1) {
@@ -92,7 +95,7 @@ public class AbstractDao<ID extends Serializable, T> implements GenericDao<ID, T
 		}
 		return result;
 	}
-
+	@Transactional( rollbackFor = Exception.class)
 	@Override
 	public Integer delete(ID[] ids) {
 		Integer count = 0;

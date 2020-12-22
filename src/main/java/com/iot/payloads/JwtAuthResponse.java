@@ -1,32 +1,34 @@
 package com.iot.payloads;
 
+import com.iot.authentication.MyUser;
+
 public class JwtAuthResponse {
-	Long id;
-	String token;
-	String reply;
+	MyUser user;
+	String jwt;
 
-	public Long getId() {
-		return id;
+	public JwtAuthResponse() {
+
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public JwtAuthResponse(MyUser user, String jwt) {
+		this.user = user;
+		this.jwt = jwt;
 	}
 
-	public String getToken() {
-		return token;
+	public MyUser getUser() {
+		return user;
 	}
 
-	public void setToken(String token) {
-		this.token = token;
+	public void setUser(MyUser user) {
+		this.user = user;
 	}
 
-	public String getReply() {
-		return reply;
+	public String getJwt() {
+		return jwt;
 	}
 
-	public void setReply(String reply) {
-		this.reply = reply;
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 
 }

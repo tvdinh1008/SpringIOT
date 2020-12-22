@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,7 +15,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
 
 @Entity
 @Table(name = "device")
@@ -36,9 +36,10 @@ public class DeviceEntity {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "user_id")
 	private UserEntity userEntity;
-	
-	@OneToMany(mappedBy = "deviceEntity", fetch = FetchType.LAZY)
-	private Set<SensorEntity> sensorList =new HashSet<SensorEntity>();
+
+	@OneToMany(mappedBy = "deviceEntity", fetch = FetchType.LAZY, cascade = {
+			CascadeType.REMOVE }, orphanRemoval = true)
+	private Set<SensorEntity> sensorList = new HashSet<SensorEntity>();
 
 	public UserEntity getUserEntity() {
 		return userEntity;

@@ -14,6 +14,7 @@ import com.iot.dao.IRoleDao;
 import com.iot.dao.IUserDao;
 import com.iot.dto.RoleDto;
 import com.iot.dto.UserDto;
+import com.iot.entity.RoleEntity;
 import com.iot.entity.UserEntity;
 import com.iot.service.IUserService;
 
@@ -24,36 +25,45 @@ public class UserService implements IUserService {
 	@Autowired
 	private IUserDao userDao;
 	@Autowired
-    private PasswordEncoder passwordEncoder;
+	private PasswordEncoder passwordEncoder;
 
 	@Override
 	public UserDto save(UserDto dto) {
 		UserDto result = null;
 		if (dto != null && dto.getId() != null) {
-			UserEntity old=userDao.findByIdUser(dto.getId());
-			//dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-			result=UserBeanUtil.entity2Dto(userDao.update(UserBeanUtil.dto2Entity(dto, old)));
-			if(result!=null) {
-				result=UserBeanUtil.entity2Dto(userDao.findByIdUser(result.getId()));
+			UserEntity old = userDao.findByIdUser(dto.getId());
+			if (!dto.getPassword().equals(old.getPassword())) {
+				old.setPassword(passwordEncoder.encode(dto.getPassword()));
+			}
+			result = UserBeanUtil.entity2Dto(userDao.update(UserBeanUtil.dto2Entity(dto, old)));
+			if (result != null) {
+				result = UserBeanUtil.entity2Dto(userDao.findByIdUser(result.getId()));
 			}
 		} else if (dto != null && dto.getId() == null) {
-			RoleDto role=RoleBeanUtil.dto2Entity(roleDao.findByCode("USER"));
-			if(role!=null) {
-				dto.setRoleDto(role);
-				dto.setCreate_time(new Date());
-				dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-				result = UserBeanUtil.entity2Dto(userDao.save(UserBeanUtil.dto2Entity(dto)));
+			if (dto.getRoleDto() != null) {
+				RoleDto role = RoleBeanUtil.dto2Entity(roleDao.findByCode(dto.getRoleDto().getCode()));
+				if (role != null) {
+					dto.setRoleDto(role);
+				}
+			} else {
+				RoleDto role = RoleBeanUtil.dto2Entity(roleDao.findByCode("USER"));
+				if (role != null) {
+					dto.setRoleDto(role);
+				}
 			}
+			dto.setCreate_time(new Date());
+			dto.setPassword(passwordEncoder.encode(dto.getPassword()));
+			result = UserBeanUtil.entity2Dto(userDao.save(UserBeanUtil.dto2Entity(dto)));
 		}
 		return result;
 	}
 
 	@Override
 	public List<UserDto> findAll() {
-		String JOIN_FETCH="roleEntity";
-		//String JOIN_FETCH="";
-		List<UserDto> result=new ArrayList<UserDto>();
-		for(UserEntity entity: userDao.findAll(JOIN_FETCH)) {
+		String JOIN_FETCH = "roleEntity";
+		// String JOIN_FETCH="";
+		List<UserDto> result = new ArrayList<UserDto>();
+		for (UserEntity entity : userDao.findAll(JOIN_FETCH)) {
 			result.add(UserBeanUtil.entity2Dto(entity));
 		}
 		return result;
@@ -66,9 +76,20 @@ public class UserService implements IUserService {
 
 	@Override
 	public UserDto findById(Long id) {
-		UserDto result=null;
-		result=UserBeanUtil.entity2Dto(userDao.findByIdUser(id));
+		UserDto result = null;
+		result = UserBeanUtil.entity2Dto(userDao.findByIdUser(id));
 		return result;
+	}
+
+	@Override
+	public Boolean deleteUser(Long[] ids) {
+		try {
+			if (ids.length == userDao.delete(ids)) {
+				return true;
+			}
+		} catch (Exception e) {
+		}
+		return false;
 	}
 
 }
