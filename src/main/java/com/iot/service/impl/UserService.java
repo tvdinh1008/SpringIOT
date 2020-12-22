@@ -33,8 +33,13 @@ public class UserService implements IUserService {
 		if (dto != null && dto.getId() != null) {
 			UserEntity old = userDao.findByIdUser(dto.getId());
 			if (!dto.getPassword().equals(old.getPassword())) {
-				old.setPassword(passwordEncoder.encode(dto.getPassword()));
+				dto.setPassword(passwordEncoder.encode(dto.getPassword()));
 			}
+			RoleDto role = RoleBeanUtil.dto2Entity(roleDao.findByCode(dto.getRoleDto().getCode()));
+			if (role != null) {
+				dto.setRoleDto(role);
+			}
+			System.out.println("");
 			result = UserBeanUtil.entity2Dto(userDao.update(UserBeanUtil.dto2Entity(dto, old)));
 			if (result != null) {
 				result = UserBeanUtil.entity2Dto(userDao.findByIdUser(result.getId()));

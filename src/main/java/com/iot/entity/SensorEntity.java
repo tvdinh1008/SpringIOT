@@ -3,6 +3,7 @@ package com.iot.entity;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -28,7 +29,8 @@ public class SensorEntity {
 	@Column(name = "status")
 	private Integer status;
 
-	@OneToMany(mappedBy = "sensorEntity", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "sensorEntity", fetch = FetchType.LAZY, cascade = {
+			CascadeType.REMOVE }, orphanRemoval = true)
 	private Set<SensorDataEntity> sensorDataList = new HashSet<SensorDataEntity>();
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)

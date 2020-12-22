@@ -55,15 +55,6 @@ public class WebAPI {
 	@Autowired
 	private JwtTokenProvider tokenProvider;
 
-	@PostMapping(value = "/api/role")
-	private String saveRole(@RequestBody RoleDto role) {
-		RoleDto result = roleService.save(role);
-		if (result != null) {
-			return "Save role success";
-		}
-		return "Save role false";
-	}
-
 	/*
 	 * Đăng nhập
 	 */
@@ -421,7 +412,7 @@ public class WebAPI {
 	}
 
 	/*
-	 * Đăng ký
+	 * Thêm thành viên mới
 	 */
 	@PostMapping(value = "/api/admin/auth/signup")
 	private JwtAuthResponse signUp(@RequestBody UserDto user, HttpServletRequest request) {
@@ -480,5 +471,35 @@ public class WebAPI {
 		}
 		return result;
 	}
-
+	
+	/*
+	 * Thêm mới role
+	 */
+	@PostMapping(value = "/api/admin/role")
+	private String saveRole(@RequestBody RoleDto role, HttpServletRequest request) {
+		RoleDto result = roleService.save(role);
+		if (result != null) {
+			return "Save role success";
+		}
+		return "Save role false";
+	}
+	/*
+	 * Lấy tất cả danh sách role
+	 */
+	@GetMapping("/api/admin/role/list")
+	private List<RoleDto> getListRole(HttpServletRequest request){
+		List<RoleDto> result=new ArrayList<RoleDto>();
+		String bearerToken = request.getHeader("Authorization");
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+			String adminToken = bearerToken.substring(7);
+			if (tokenProvider.validateJwtToken(adminToken)) {
+				UserDto admin = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(adminToken));
+				if (admin != null && admin.getRoleDto().getCode().equals("ADMIN")) {
+					result=roleService.getListRole();
+				}
+			}
+		}
+		return result;
+	}
+	
 }
