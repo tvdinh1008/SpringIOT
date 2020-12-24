@@ -71,7 +71,7 @@ public class SensorService implements ISensorService {
 	}
 
 	@Override
-	public List<SensorDto> getAllData(Long deviceid, String condition) {
+	public List<SensorDto> getAllData(Long deviceid, String prop, String date) {
 		List<Long> ids = new ArrayList<Long>();
 		List<SensorDto> result = new ArrayList<SensorDto>();
 		//
@@ -83,14 +83,36 @@ public class SensorService implements ISensorService {
 					ids.add(sensor.getId());
 				}
 			}
-			if (StringUtils.isNotBlank(condition)) {
-				condition = condition.toUpperCase();
-				if (condition.equals("MONTH")) {
-					condition = "AND month(time)=month(current_date())";
-				} else if (condition.equals("YEAR")) {
-					condition = "AND year(time)=year(current_date())";
-				} else if (condition.equals("DAY")) {
-					condition = "AND day(time)=day(current_date())";
+			String condition = "";
+			if (StringUtils.isNotBlank(prop)) {
+				prop = prop.toUpperCase();
+				String[] tmp = date.split("-");
+				if (prop.equals("MONTH")) {
+					// lấy theo tháng + năm
+					if (tmp.length == 2) {
+						condition = "AND month(time)=" + tmp[0] + " AND year(time)=" + tmp[1];
+					}
+					// Lấy theo tháng
+					if (tmp.length == 1) {
+						condition = "AND month(time)=" + tmp[0];
+					}
+					// prop = "AND month(time)=month(current_date())";
+				} else if (prop.equals("YEAR")) {
+					condition = "AND year(time)=" + tmp[0];
+				} else if (prop.equals("DAY")) {
+					if (tmp.length == 1) {
+						condition = "AND day(time)=" + tmp[0];
+					}
+					if (tmp.length == 2) {
+						condition = "AND day(time)=" + tmp[0] + " AND month(time)=" + tmp[1];
+					}
+					if (tmp.length == 3) {
+						condition = "AND day(time)=" + tmp[0] + " AND year(time)=" + tmp[2];
+						if (StringUtils.isNotBlank(tmp[1])) {
+							condition = "AND day(time)=" + tmp[0] + " AND month(time)=" + tmp[1] + " AND year(time)="
+									+ tmp[2];
+						}
+					}
 				} else {
 					return result;
 				}

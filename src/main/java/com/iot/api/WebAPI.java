@@ -252,7 +252,7 @@ public class WebAPI {
 	 */
 	@GetMapping("/api/device/{id}/alldata")
 	public List<SensorDto> getAllDataSensor(@PathVariable("id") Long id) {
-		List<SensorDto> result = sensorService.getAllData(id,"");
+		List<SensorDto> result = sensorService.getAllData(id,"","");
 		return result;
 	}
 
@@ -505,10 +505,17 @@ public class WebAPI {
 	
 	/*
 	 * Lấy tất cả dữ liệu sensor (theo prop= year,month,day) có status=1 liên quan đến device
+	 * prop
+	 * TH1: year thì date=2020
+	 * TH2: month: date=8 lấy theo tất cả tháng 8 còn date=8-2020 thì lấy tháng 8 của 2020
+	 * TH3: day: date=10 lấy tất cả ngay 10. date=10-8 thì lấy ngay 10 tháng 8 của tất cả các năm. date=10-8-2020
+	 * date=10--2020 lấy tất cả ngày 10 của năm 2020
+	 * 
+	 * ví dụ url=http://localhost:8080/SpringIOT/api/device/3/alldata/day/10-8-2020
 	 */
-	@GetMapping("/api/device/{id}/alldata/{prop}")
-	public List<SensorDto> getAllDataSensorProp(@PathVariable("id") Long id, @PathVariable("prop") String prop, HttpServletRequest request) {
-		List<SensorDto> result= sensorService.getAllData(id,prop);
+	@GetMapping("/api/device/{id}/alldata/{prop}/{date}")
+	public List<SensorDto> getAllDataSensorProp(@PathVariable("id") Long id, @PathVariable("prop") String prop, @PathVariable("date") String date, HttpServletRequest request) {
+		List<SensorDto> result= sensorService.getAllData(id,prop,date);
 		return result;
 	}
 	

@@ -29,7 +29,7 @@ public class SensorDao extends AbstractDao<Long, SensorEntity> implements ISenso
 		SensorEntity entity = null;
 		try {
 			String sql = "select t from " + getPersistenceClassName()
-					+ " t JOIN FETCH t.sensorDataList where t.id=:id and t.status=1"+condition;
+					+ " t JOIN FETCH t.sensorDataList where t.id=:id and t.status=1 "+condition;
 			Query q = entityManager.createQuery(sql);
 			q.setParameter("id", id);
 			entity = (SensorEntity) q.getSingleResult();
