@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,7 +71,7 @@ public class SensorService implements ISensorService {
 	}
 
 	@Override
-	public List<SensorDto> getAllData(Long deviceid) {
+	public List<SensorDto> getAllData(Long deviceid, String condition) {
 		List<Long> ids = new ArrayList<Long>();
 		List<SensorDto> result = new ArrayList<SensorDto>();
 		//
@@ -82,8 +83,20 @@ public class SensorService implements ISensorService {
 					ids.add(sensor.getId());
 				}
 			}
+			if (StringUtils.isNotBlank(condition)) {
+				condition = condition.toUpperCase();
+				if (condition.equals("MONTH")) {
+					condition = "AND month(time)=month(current_date())";
+				} else if (condition.equals("YEAR")) {
+					condition = "AND year(time)=year(current_date())";
+				} else if (condition.equals("DAY")) {
+					condition = "AND day(time)=day(current_date())";
+				} else {
+					return result;
+				}
+			}
 			for (Long id : ids) {
-				SensorEntity entity = sensorDao.findAllDataSensor(id);
+				SensorEntity entity = sensorDao.findAllDataSensor(id, condition);
 				if (entity != null) {
 					result.add(SensorBeanUtil.entity2Dto(entity, 0));
 				}
@@ -91,7 +104,6 @@ public class SensorService implements ISensorService {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-
 		return result;
 	}
 

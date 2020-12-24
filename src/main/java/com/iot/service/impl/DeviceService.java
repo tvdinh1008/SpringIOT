@@ -80,7 +80,7 @@ public class DeviceService implements IDeviceService {
 		DeviceDto result = null;
 		try {
 			String JOIN_FETCH = "sensorList";
-			result = DeviceBeanUtil.entity2Dto(deviceDao.findByIdWithProp(id, JOIN_FETCH, 1, ""));
+			result = DeviceBeanUtil.entity2Dto(deviceDao.findByIdWithProp(id, JOIN_FETCH, 0, ""));
 		} catch (Exception e) {
 		}
 		return result;
@@ -102,8 +102,8 @@ public class DeviceService implements IDeviceService {
 	public DeviceDto getInfoDevice(Long id, String username) {
 		DeviceDto result = null;
 		try {
-			String JOIN_FETCH = "sensorList s LEFT JOIN FETCH s.sensorDataList";
-			result = DeviceBeanUtil.entity2Dto(deviceDao.findByIdWithProp(id, JOIN_FETCH, 0, username), 2);
+			String JOIN_FETCH = "sensorList s LEFT JOIN FETCH s.sensorDataList sd";
+			result = DeviceBeanUtil.entity2Dto(deviceDao.findByIdWithProp(id, JOIN_FETCH, 1, username), 2);
 		} catch (Exception e) {
 		}
 		return result;

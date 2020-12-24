@@ -252,7 +252,7 @@ public class WebAPI {
 	 */
 	@GetMapping("/api/device/{id}/alldata")
 	public List<SensorDto> getAllDataSensor(@PathVariable("id") Long id) {
-		List<SensorDto> result = sensorService.getAllData(id);
+		List<SensorDto> result = sensorService.getAllData(id,"");
 		return result;
 	}
 
@@ -340,6 +340,7 @@ public class WebAPI {
 
 	/*
 	 * Lấy thông danh sách device ứng với 1 user dựa vào jwt admin
+	 * return: List(thông tin device và sensor ứng với device đó ko trả về sensor datalist)
 	 */
 	@GetMapping("/api/admin/{username}/device/list")
 	public List<DeviceDto> getListDeviceUserByAdmin(@PathVariable("username") String username,
@@ -362,7 +363,7 @@ public class WebAPI {
 
 	/*
 	 * Lấy tất cả thông tin của thiết bị dựa vào jwt admin
-	 * 
+	 * return: thông tin device và sensor ứng với device và list sensordata ứng với sensor
 	 */
 	@GetMapping("/api/admin/{username}/device/{id}")
 	public DeviceDto getInfoDeviceUserByAdmin(@PathVariable("id") Long id, @PathVariable("username") String username,
@@ -499,6 +500,15 @@ public class WebAPI {
 				}
 			}
 		}
+		return result;
+	}
+	
+	/*
+	 * Lấy tất cả dữ liệu sensor (theo prop= year,month,day) có status=1 liên quan đến device
+	 */
+	@GetMapping("/api/device/{id}/alldata/{prop}")
+	public List<SensorDto> getAllDataSensorProp(@PathVariable("id") Long id, @PathVariable("prop") String prop, HttpServletRequest request) {
+		List<SensorDto> result= sensorService.getAllData(id,prop);
 		return result;
 	}
 	

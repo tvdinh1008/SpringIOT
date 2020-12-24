@@ -56,9 +56,9 @@ public class DeviceDao extends AbstractDao<Long, DeviceEntity> implements IDevic
 		if (StringUtils.isNotBlank(username)) {
 			String sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t." + JOIN_FETCH
 					+ " JOIN FETCH t.userEntity u where t.id=:id and u.username=:username";
-			if (status == 1) {
+			if (status == 1) { 
 				sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t." + JOIN_FETCH
-						+ " s JOIN FETCH t.userEntity u where t.id=:id and s.status=1 and u.username=:username";
+						+ " JOIN FETCH t.userEntity u where t.id=:id and s.status=1 and u.username=:username";
 			}
 			try {
 				Query q = entityManager.createQuery(sql);

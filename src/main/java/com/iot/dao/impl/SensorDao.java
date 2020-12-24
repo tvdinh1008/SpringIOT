@@ -25,11 +25,11 @@ public class SensorDao extends AbstractDao<Long, SensorEntity> implements ISenso
 	}
 
 	@Override
-	public SensorEntity findAllDataSensor(Long id) {
+	public SensorEntity findAllDataSensor(Long id, String condition) {
 		SensorEntity entity = null;
 		try {
 			String sql = "select t from " + getPersistenceClassName()
-					+ " t JOIN FETCH t.sensorDataList where t.id=:id and t.status=1";
+					+ " t JOIN FETCH t.sensorDataList where t.id=:id and t.status=1"+condition;
 			Query q = entityManager.createQuery(sql);
 			q.setParameter("id", id);
 			entity = (SensorEntity) q.getSingleResult();

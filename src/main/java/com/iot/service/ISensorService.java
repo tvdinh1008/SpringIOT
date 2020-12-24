@@ -9,5 +9,5 @@ public interface ISensorService {
 	SensorDto save(SensorDto dto);
 	List<SensorDto> findByListDeviceId(Long id);
 	void saveCollectData(CollectDataModel collectData);
-	List<SensorDto> getAllData(Long deviceid);
+	List<SensorDto> getAllData(Long deviceid, String condition);
 }
