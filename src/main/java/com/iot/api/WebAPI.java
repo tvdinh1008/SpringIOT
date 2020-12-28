@@ -520,6 +520,14 @@ public class WebAPI {
 		return result;
 	}
 	
+	
+	/*
+	 * Muốn lấy theo tháng truyền vào: http://localhost:8080/SpringIOT/api/device/3/alldatasensor/month/12-2020
+	 * return list gồm các ngày trong tháng có dữ liệu ứng với list sensor của device
+	 * 
+	 * Muốn lấy theo năm truyền vào :http://localhost:8080/SpringIOT/api/device/3/alldatasensor/year/2020
+	 * return list gồm các tháng trong năm có dữ liệu ứng với list sensor của device
+	 */
 	@GetMapping("/api/device/{id}/alldatasensor/{prop}/{date}")
 	public List<SensorAllDto> getAllDataSensorWithProp(@PathVariable("id") Long id, @PathVariable("prop") String prop, @PathVariable("date") String date, HttpServletRequest request) {
 		return sensorService.getAllSensorData(id, prop, date);
