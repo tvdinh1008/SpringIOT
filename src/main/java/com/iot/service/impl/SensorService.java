@@ -3,6 +3,7 @@ package com.iot.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import com.iot.converter.SensorBeanUtil;
 import com.iot.dao.IDeviceDao;
 import com.iot.dao.ISensorDao;
 import com.iot.dao.ISensorDataDao;
+import com.iot.dto.DataDto;
+import com.iot.dto.SensorAllDto;
 import com.iot.dto.SensorDto;
 import com.iot.entity.DeviceEntity;
 import com.iot.entity.SensorDataEntity;
@@ -129,4 +132,35 @@ public class SensorService implements ISensorService {
 		return result;
 	}
 
+	@Override
+	public List<SensorAllDto> getAllSensorData(Long deviceid, String prop, String date) {
+		List<SensorEntity> sensorList = new ArrayList<SensorEntity>();
+		List<SensorAllDto> result = new ArrayList<SensorAllDto>();
+		try {
+			String fetch = "sensorList";
+			DeviceEntity device = deviceDao.findByIdWithProp(deviceid, fetch, 0, "");
+			if (device != null) {
+				for (SensorEntity sensor : device.getSensorList()) {
+					sensorList.add(sensor);
+				}
+			}
+			int status = 0;
+			if (prop.equals("year")) {
+				status = 1;
+			}
+			for (SensorEntity sensor : sensorList) {
+				SensorAllDto sensorAllDto = new SensorAllDto();
+				sensorAllDto.setCode(sensor.getCode());
+				sensorAllDto.setId(sensor.getId());
+				sensorAllDto.setStatus(sensor.getStatus());
+				List<Object[]> listData = sensorDao.getAllDataSensorWithProp(sensor.getId(), status, date);
+				List<DataDto> listOfDTO = listData.stream().map(DataDto::new).collect(Collectors.toList());
+				sensorAllDto.setListData(listOfDTO);
+				result.add(sensorAllDto);
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return result;
+	}
 }

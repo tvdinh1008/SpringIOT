@@ -24,6 +24,7 @@ import com.iot.authentication.JwtTokenProvider;
 import com.iot.authentication.MyUser;
 import com.iot.dto.DeviceDto;
 import com.iot.dto.RoleDto;
+import com.iot.dto.SensorAllDto;
 import com.iot.dto.SensorDataDto;
 import com.iot.dto.SensorDto;
 import com.iot.dto.UserDto;
@@ -518,5 +519,12 @@ public class WebAPI {
 		List<SensorDto> result= sensorService.getAllData(id,prop,date);
 		return result;
 	}
+	
+	@GetMapping("/api/device/{id}/alldatasensor/{prop}/{date}")
+	public List<SensorAllDto> getAllDataSensorWithProp(@PathVariable("id") Long id, @PathVariable("prop") String prop, @PathVariable("date") String date, HttpServletRequest request) {
+		return sensorService.getAllSensorData(id, prop, date);
+	}
+	
+	
 	
 }
