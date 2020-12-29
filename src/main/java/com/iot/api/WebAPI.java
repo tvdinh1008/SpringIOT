@@ -253,7 +253,7 @@ public class WebAPI {
 	 */
 	@GetMapping("/api/device/{id}/alldata")
 	public List<SensorDto> getAllDataSensor(@PathVariable("id") Long id) {
-		List<SensorDto> result = sensorService.getAllData(id,"","");
+		List<SensorDto> result = sensorService.getAllData(id, "", "");
 		return result;
 	}
 
@@ -340,8 +340,8 @@ public class WebAPI {
 	}
 
 	/*
-	 * Lấy thông danh sách device ứng với 1 user dựa vào jwt admin
-	 * return: List(thông tin device và sensor ứng với device đó ko trả về sensor datalist)
+	 * Lấy thông danh sách device ứng với 1 user dựa vào jwt admin return:
+	 * List(thông tin device và sensor ứng với device đó ko trả về sensor datalist)
 	 */
 	@GetMapping("/api/admin/{username}/device/list")
 	public List<DeviceDto> getListDeviceUserByAdmin(@PathVariable("username") String username,
@@ -363,8 +363,8 @@ public class WebAPI {
 	}
 
 	/*
-	 * Lấy tất cả thông tin của thiết bị dựa vào jwt admin
-	 * return: thông tin device và sensor ứng với device và list sensordata ứng với sensor
+	 * Lấy tất cả thông tin của thiết bị dựa vào jwt admin return: thông tin device
+	 * và sensor ứng với device và list sensordata ứng với sensor
 	 */
 	@GetMapping("/api/admin/{username}/device/{id}")
 	public DeviceDto getInfoDeviceUserByAdmin(@PathVariable("id") Long id, @PathVariable("username") String username,
@@ -473,7 +473,7 @@ public class WebAPI {
 		}
 		return result;
 	}
-	
+
 	/*
 	 * Thêm mới role
 	 */
@@ -485,54 +485,63 @@ public class WebAPI {
 		}
 		return "Save role false";
 	}
+
 	/*
 	 * Lấy tất cả danh sách role
 	 */
 	@GetMapping("/api/admin/role/list")
-	private List<RoleDto> getListRole(HttpServletRequest request){
-		List<RoleDto> result=new ArrayList<RoleDto>();
+	private List<RoleDto> getListRole(HttpServletRequest request) {
+		List<RoleDto> result = new ArrayList<RoleDto>();
 		String bearerToken = request.getHeader("Authorization");
 		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
 			String adminToken = bearerToken.substring(7);
 			if (tokenProvider.validateJwtToken(adminToken)) {
 				UserDto admin = userService.getUserWithUsername(tokenProvider.getUserNameFromJwtToken(adminToken));
 				if (admin != null && admin.getRoleDto().getCode().equals("ADMIN")) {
-					result=roleService.getListRole();
+					result = roleService.getListRole();
 				}
 			}
 		}
 		return result;
 	}
-	
+
 	/*
-	 * Lấy tất cả dữ liệu sensor (theo prop= year,month,day) có status=1 liên quan đến device
-	 * prop
-	 * TH1: year thì date=2020
-	 * TH2: month: date=8 lấy theo tất cả tháng 8 còn date=8-2020 thì lấy tháng 8 của 2020
-	 * TH3: day: date=10 lấy tất cả ngay 10. date=10-8 thì lấy ngay 10 tháng 8 của tất cả các năm. date=10-8-2020
+	 * Lấy tất cả dữ liệu sensor (theo prop= year,month,day) có status=1 liên quan
+	 * đến device prop TH1: year thì date=2020 TH2: month: date=8 lấy theo tất cả
+	 * tháng 8 còn date=8-2020 thì lấy tháng 8 của 2020 TH3: day: date=10 lấy tất cả
+	 * ngay 10. date=10-8 thì lấy ngay 10 tháng 8 của tất cả các năm. date=10-8-2020
 	 * date=10--2020 lấy tất cả ngày 10 của năm 2020
 	 * 
 	 * ví dụ url=http://localhost:8080/SpringIOT/api/device/3/alldata/day/10-8-2020
 	 */
 	@GetMapping("/api/device/{id}/alldata/{prop}/{date}")
-	public List<SensorDto> getAllDataSensorProp(@PathVariable("id") Long id, @PathVariable("prop") String prop, @PathVariable("date") String date, HttpServletRequest request) {
-		List<SensorDto> result= sensorService.getAllData(id,prop,date);
+	public List<SensorDto> getAllDataSensorProp(@PathVariable("id") Long id, @PathVariable("prop") String prop,
+			@PathVariable("date") String date, HttpServletRequest request) {
+		List<SensorDto> result = sensorService.getAllData(id, prop, date);
 		return result;
 	}
-	
-	
+
 	/*
-	 * Muốn lấy theo tháng truyền vào: http://localhost:8080/SpringIOT/api/device/3/alldatasensor/month/12-2020
-	 * return list gồm các ngày trong tháng có dữ liệu ứng với list sensor của device
+	 * Muốn lấy theo tháng truyền vào:
+	 * http://localhost:8080/SpringIOT/api/device/3/alldatasensor/month/12-2020
+	 * return list gồm các ngày trong tháng có dữ liệu ứng với list sensor của
+	 * device
 	 * 
-	 * Muốn lấy theo năm truyền vào :http://localhost:8080/SpringIOT/api/device/3/alldatasensor/year/2020
-	 * return list gồm các tháng trong năm có dữ liệu ứng với list sensor của device
+	 * Muốn lấy theo năm truyền vào
+	 * :http://localhost:8080/SpringIOT/api/device/3/alldatasensor/year/2020 return
+	 * list gồm các tháng trong năm có dữ liệu ứng với list sensor của device
 	 */
 	@GetMapping("/api/device/{id}/alldatasensor/{prop}/{date}")
-	public List<SensorAllDto> getAllDataSensorWithProp(@PathVariable("id") Long id, @PathVariable("prop") String prop, @PathVariable("date") String date, HttpServletRequest request) {
+	public List<SensorAllDto> getAllDataSensorWithProp(@PathVariable("id") Long id, @PathVariable("prop") String prop,
+			@PathVariable("date") String date, HttpServletRequest request) {
 		return sensorService.getAllSensorData(id, prop, date);
 	}
-	
-	
-	
+
+	@GetMapping("/api/device/sumdata/{prop}/{date}")
+	public Float getSumDataProp(@PathVariable("prop") String prop, @PathVariable("date") String date, HttpServletRequest request) {
+		Float result = 0f;
+		result=sensorDataService.getSumDataProp(prop, date);
+		return result;
+	}
+
 }

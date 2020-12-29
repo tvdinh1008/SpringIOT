@@ -78,7 +78,7 @@ public class JwtTokenProvider {
 		claims.put("deviceId", deviceid);
 		
 		return Jwts.builder().setClaims(claims)
-				.setExpiration(new Date((new Date()).getTime() + 120000L)) //thời gian có hiệu lực là 2 phút
+				.setExpiration(new Date((new Date()).getTime() + 360000L)) //thời gian có hiệu lực là 6 phút
 				.signWith(SignatureAlgorithm.HS512, JWT_SECRET).compact();
 	}
 

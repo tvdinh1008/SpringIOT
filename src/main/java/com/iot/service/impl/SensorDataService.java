@@ -65,4 +65,9 @@ public class SensorDataService implements ISensorDataService {
 
 		return result;
 	}
+
+	@Override
+	public Float getSumDataProp(String prop, String date) {
+		return sensorDataDao.getSumDataProp(prop, date);
+	}
 }

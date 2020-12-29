@@ -153,6 +153,7 @@ public class SensorService implements ISensorService {
 				sensorAllDto.setCode(sensor.getCode());
 				sensorAllDto.setId(sensor.getId());
 				sensorAllDto.setStatus(sensor.getStatus());
+				sensorAllDto.setName(sensor.getName());
 				List<Object[]> listData = sensorDao.getAllDataSensorWithProp(sensor.getId(), status, date);
 				List<DataDto> listOfDTO = listData.stream().map(DataDto::new).collect(Collectors.toList());
 				sensorAllDto.setListData(listOfDTO);

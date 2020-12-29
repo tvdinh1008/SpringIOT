@@ -7,6 +7,7 @@ public class SensorAllDto {
 	Long id;
 	String code;
 	Integer status;
+	String name;
 	List<DataDto> listData = new ArrayList<DataDto>();
 
 	public Long getId() {
@@ -15,6 +16,14 @@ public class SensorAllDto {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getCode() {
