@@ -12,6 +12,8 @@ public class DeviceBeanUtil {
 		dto.setId(entity.getId());
 		dto.setAlive(entity.getAlive());
 		dto.setName(entity.getName());
+		dto.setToken_auth(entity.getToken_auth());
+		dto.setToken_collect_data(entity.getToken_collect_data());
 		dto.setCreated_at(entity.getCreated_at());
 		dto.setUpdated_at(entity.getUpdated_at());
 		try {
@@ -37,6 +39,8 @@ public class DeviceBeanUtil {
 		dto.setId(entity.getId());
 		dto.setAlive(entity.getAlive());
 		dto.setName(entity.getName());
+		dto.setToken_auth(entity.getToken_auth());
+		dto.setToken_collect_data(entity.getToken_collect_data());
 		dto.setCreated_at(entity.getCreated_at());
 		dto.setUpdated_at(entity.getUpdated_at());
 		try {
@@ -65,6 +69,8 @@ public class DeviceBeanUtil {
 		entity.setId(dto.getId());
 		entity.setAlive(dto.getAlive());
 		entity.setName(dto.getName());
+		entity.setToken_auth(dto.getToken_auth());
+		entity.setToken_collect_data(dto.getToken_collect_data());
 		entity.setCreated_at(dto.getCreated_at());
 		entity.setUpdated_at(dto.getUpdated_at());
 		try {
@@ -96,6 +102,8 @@ public class DeviceBeanUtil {
 		// entity.setCreated_at(dto.getCreated_at());
 		entity.setUpdated_at(dto.getUpdated_at());
 		entity.setName(dto.getName());
+		//entity.setToken_auth(dto.getToken_auth());
+		//entity.setToken_collect_data(dto.getToken_collect_data());
 		return entity;
 	}
 }

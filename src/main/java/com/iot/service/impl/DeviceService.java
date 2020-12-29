@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.iot.authentication.JwtTokenProvider;
 import com.iot.converter.DeviceBeanUtil;
 import com.iot.converter.SensorBeanUtil;
 import com.iot.dao.IDeviceDao;
@@ -29,6 +30,8 @@ public class DeviceService implements IDeviceService {
 	private ISensorDao sensorDao;
 	@Autowired
 	private IUserDao userDao;
+	@Autowired
+	private JwtTokenProvider tokenProvider;
 
 	@Override
 	public DeviceDto findById(Long id) {
@@ -59,7 +62,8 @@ public class DeviceService implements IDeviceService {
 			try {
 				DeviceEntity entity = DeviceBeanUtil.dto2Entity(dto);
 				entity = deviceDao.save(entity);
-				// String code[]= {"SENSOR1","SENSOR2","SENSOR3","SENSOR4","SENSOR5"};
+				String tokenAuth=tokenProvider.generateTokenAuthActiveDevice(dto.getUserDto().getUsername(), entity.getId());
+				//String code[]= {"SENSOR1","SENSOR2","SENSOR3","SENSOR4","SENSOR5"};
 				for (SensorEntity sensor : entity.getSensorList()) {
 					sensor.setDeviceEntity(entity);
 					sensorDao.save(sensor);
@@ -67,6 +71,8 @@ public class DeviceService implements IDeviceService {
 				/*
 				 * Khi save thì listSensor của result cũng đã được gắn luôn id
 				 */
+				entity.setToken_auth(tokenAuth);
+				entity=deviceDao.update(entity);
 				result = DeviceBeanUtil.entity2Dto(entity);
 			} catch (Exception e) {
 				System.out.println(e.getMessage());

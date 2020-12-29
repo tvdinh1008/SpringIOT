@@ -28,8 +28,15 @@ public class DeviceEntity {
 	@Column(name = "name", columnDefinition = "nvarchar(250)")
 	private String name;
 
+	@Column(name = "token_auth", columnDefinition = "nvarchar(500)")
+	private String token_auth;
+
+	@Column(name = "token_collect_data", columnDefinition = "nvarchar(500)")
+	private String token_collect_data;
+
 	@Column(name = "created_at")
 	private Date created_at;
+
 	@Column(name = "updated_at")
 	private Date updated_at;
 
@@ -43,6 +50,22 @@ public class DeviceEntity {
 
 	public UserEntity getUserEntity() {
 		return userEntity;
+	}
+
+	public String getToken_auth() {
+		return token_auth;
+	}
+
+	public void setToken_auth(String token_auth) {
+		this.token_auth = token_auth;
+	}
+
+	public String getToken_collect_data() {
+		return token_collect_data;
+	}
+
+	public void setToken_collect_data(String token_collect_data) {
+		this.token_collect_data = token_collect_data;
 	}
 
 	public void setUserEntity(UserEntity userEntity) {

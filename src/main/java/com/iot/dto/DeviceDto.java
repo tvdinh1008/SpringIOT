@@ -12,6 +12,8 @@ public class DeviceDto implements Serializable {
 	private Long id;
 	private Integer alive;
 	private String name;
+	private String token_auth;
+	private String token_collect_data;
 	private Date created_at;
 	private Date updated_at;
 	private UserDto userDto;
@@ -19,6 +21,22 @@ public class DeviceDto implements Serializable {
 
 	public Long getId() {
 		return id;
+	}
+
+	public String getToken_auth() {
+		return token_auth;
+	}
+
+	public void setToken_auth(String token_auth) {
+		this.token_auth = token_auth;
+	}
+
+	public String getToken_collect_data() {
+		return token_collect_data;
+	}
+
+	public void setToken_collect_data(String token_collect_data) {
+		this.token_collect_data = token_collect_data;
 	}
 
 	public void setId(Long id) {

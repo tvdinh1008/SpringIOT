@@ -1,6 +1,6 @@
 package com.iot.mqtt;
 
-public class KeepAliveMessageModel {
+public class AuthRequest {
 	Long deviceId;
 	String token;
 	String active;

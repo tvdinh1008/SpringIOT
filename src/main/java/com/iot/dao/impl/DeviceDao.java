@@ -169,4 +169,20 @@ public class DeviceDao extends AbstractDao<Long, DeviceEntity> implements IDevic
 		return result;
 	}
 
+	@Override
+	public DeviceEntity findByIdUser(Long id) {
+		DeviceEntity result = null;
+		try {
+			String sql = "Select t from " + getPersistenceClassName() + " t" + " JOIN FETCH t.userEntity u"
+					+ " where t.id=:id";
+
+			Query q = entityManager.createQuery(sql);
+			q.setParameter("id", id);
+			result = (DeviceEntity) q.getSingleResult();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return result;
+	}
+
 }
