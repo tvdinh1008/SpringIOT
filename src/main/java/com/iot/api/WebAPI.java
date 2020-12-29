@@ -332,7 +332,7 @@ public class WebAPI {
 					device = deviceService.save(device);
 					result.setDeviceDto(device);
 					result.setDeviceId(device.getId());
-					result.setToken(user_token);
+					result.setToken(device.getToken_auth());
 				}
 			}
 		}
