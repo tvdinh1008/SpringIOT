@@ -32,3 +32,10 @@ Mô hình MVC trong Spring và luồng dữ liệu chạy: View -> controller ->
 - Để lấy dữ liệu từ 3 bảng: Device-Sensor-DataSensor. Nếu ta để là Select t from DeviceEntity t sensorList s JOIN FETCH s.sensorDataList.
     + Nó sẽ xấy ra TH đặc biệt là Datasensor ko có gì thì nó sẽ ko query được vì dùng inner join
     + Khắc phục để là  Select t from DeviceEntity t sensorList s LEFT JOIN FETCH s.sensorDataList.
+
+
+
+- ESP32:
+    + Khi sử dụng thư viện PubSubClient thì kích thước tối đa gói tin gửi hoặc nhận sẽ là 128 bytes hoặc (256 byte) xem ở file PubSubClient.h và biến là MQTT_MAX_PACKET_SIZE. Để thay đổi giá trị vào file PubSubClient.h để thay đổi vidu 1024 
+    + Cảm biến DHT22 hoặc DHT11 thì sử dụng thư viện SimpleDHT thay cho DHT(sử dụng cho arduino).
+    
