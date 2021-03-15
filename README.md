@@ -1,5 +1,5 @@
 # SpringIOT
-- Báo cáo : https://drive.google.com/drive/folders/1qdfoCLDsXHXp1einD5LYVL3YaGFDA_Km?usp=sharing
+- Báo cáo hệ thống giám sát lượng nước trong thành phố: https://drive.google.com/drive/folders/1qdfoCLDsXHXp1einD5LYVL3YaGFDA_Km?usp=sharing
 - FrontEnd - BackEnd
 - Các thư viện liên quan:
     - SpringMVC 4, Spring security
